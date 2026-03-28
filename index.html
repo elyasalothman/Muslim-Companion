@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>رفيق المسلم</title>
-  <meta name="theme-color" content="#1a5e3a" />
-  <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="icon" sizes="192x192" href="/assets/icons/icon-192.png" />
-  <link rel="stylesheet" href="/css/styles.css" />
+  <meta name="theme-color" content="#1a5e3a"/>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" sizes="192x192" href="./icon-192.png" />
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <header>
@@ -25,13 +25,10 @@
     <div class="info-card"><h3>إنجازك اليوم</h3><p><span id="daily-stats">0</span> ذكر</p></div>
   </section>
 
-  <nav class="nav-container" id="navMenu">
+  <nav class="nav-container">
     <button class="nav-btn active" data-target="athan">مواقيت الصلاة</button>
     <button class="nav-btn" data-target="rosary">المسبحة</button>
     <button class="nav-btn" data-target="morning">الصباح</button>
-    <button class="nav-btn" data-target="evening">المساء</button>
-    <button class="nav-btn" data-target="sleep">النوم</button>
-    <button class="nav-btn" data-target="prayer">بعد الصلاة</button>
     <button class="nav-btn" data-target="qibla">اتجاه القبلة</button>
   </nav>
 
@@ -52,8 +49,6 @@
             <option value="الحمد لله">الحمد لله</option>
             <option value="لا إله إلا الله">لا إله إلا الله</option>
             <option value="الله أكبر">الله أكبر</option>
-            <option value="أستغفر الله">أستغفر الله</option>
-            <option value="الصلاة على النبي">اللهم صلِّ على محمد</option>
           </select>
           <button class="btn secondary" id="reset-rosary">تصفير</button>
         </div>
@@ -61,9 +56,6 @@
     </section>
 
     <section id="morning" class="section" data-title="أذكار الصباح"></section>
-    <section id="evening" class="section" data-title="أذكار المساء"></section>
-    <section id="sleep" class="section" data-title="أذكار النوم"></section>
-    <section id="prayer" class="section" data-title="أذكار دبر الصلوات"></section>
 
     <section id="qibla" class="section">
       <h2 class="section-title">اتجاه القبلة</h2>
@@ -78,6 +70,6 @@
     </section>
   </main>
 
-  <script src="/js/app.js" type="module"></script>
+  <script src="./app.js" type="module"></script>
 </body>
 </html>
