@@ -13,9 +13,7 @@
 <header>
   <div class="header-wrap">
     <div class="brand"><img src="./assets/img/icon-192.png" alt=""/><span>رفيق المسلم</span></div>
-    <div class="toolbar">
-      <button id="toggleTheme" title="الوضع الليلي/النهاري">☯</button>
-    </div>
+    <div class="toolbar"><button id="toggleTheme" title="الوضع الليلي/النهاري">☯</button></div>
   </div>
 </header>
 
@@ -23,7 +21,10 @@
   <div class="card">
     <div class="grid">
       <div class="kpi"><div class="label">التاريخ الهجري</div><div class="value" id="hijri">—</div></div>
-      <div class="kpi"><div class="label">الصلاة القادمة</div><div class="value"><span id="nextPrayerName">—</span> <span class="small">(</span><span id="nextPrayerTime">—</span><span class="small">)</span></div><div class="small" id="nextCountdown">—</div></div>
+      <div class="kpi"><div class="label">الصلاة القادمة</div>
+        <div class="value"><span id="nextPrayerName">—</span> <span class="small">(</span><span id="nextPrayerTime">—</span><span class="small">)</span></div>
+        <div class="small" id="nextCountdown">—</div>
+      </div>
       <div class="kpi"><div class="label">الإصدار</div><div class="value" id="version">0.0.0</div><div class="small">Build: <span id="build">—</span></div></div>
     </div>
   </div>
@@ -34,6 +35,9 @@
       <button data-target="qibla">القبلة</button>
       <button data-target="adhkar">الأذكار</button>
       <button data-target="tasbeeh">المسبحة</button>
+      <button data-target="quran">القرآن</button>
+      <button data-target="learning">تعلم</button>
+      <button data-target="tools">أدوات</button>
       <button data-target="resources">روابط</button>
       <button data-target="about">عن</button>
     </div>
@@ -63,22 +67,15 @@
         <tr><th>العشاء</th><td id="t_isha">—</td></tr>
         <tr><th>الثلث الأخير</th><td id="t_lastthird">—</td></tr>
       </table>
-
-      <p class="small" style="margin:10px 0 0">تنبيه: وقت الضحى تقريبي (الشروق + 15 دقيقة) إلى (قبل الظهر بـ 10 دقائق) ويمكن تعديله من الإعدادات لاحقًا.</p>
+      <p class="small" style="margin:10px 0 0">الضحى: (الشروق + 15 دقيقة) إلى (قبل الظهر بـ 10 دقائق). الثلث الأخير محسوب من المغرب إلى فجر الغد.</p>
     </section>
 
     <section id="qibla" class="section">
       <p>زاوية القبلة (من الشمال الحقيقي): <b id="qiblaDeg">—</b></p>
-      <div class="compass">
-        <div class="dial"></div>
-        <div id="needle" class="needle"></div>
-      </div>
-      <div class="row">
-        <button class="btn" id="enableCompass">تفعيل البوصلة</button>
-        <span class="small" id="compassStatus"></span>
-      </div>
+      <div class="compass"><div class="dial"></div><div id="needle" class="needle"></div></div>
+      <div class="row"><button class="btn" id="enableCompass">تفعيل البوصلة</button><span class="small" id="compassStatus"></span></div>
       <div class="small" id="compassAccuracy"></div>
-      <p class="small">للأفضل: ضع الهاتف أفقيًا بعيدًا عن المعادن، وقد تحتاج حركة «رقم 8» للمعايرة.</p>
+      <p class="small">ضع الهاتف أفقيًا بعيدًا عن المعادن، وقد تحتاج حركة «رقم 8» للمعايرة.</p>
     </section>
 
     <section id="adhkar" class="section">
@@ -91,23 +88,41 @@
         <div class="card"><div id="afterPrayer"></div></div>
       </div>
       <div class="card" style="margin-top:10px"><div id="daily"></div></div>
-      <p class="small">تُحفظ التكرارات لليوم الحالي فقط وتُعاد تلقائيًا في اليوم التالي.</p>
+      <p class="small">تُحفظ التكرارات لليوم الحالي فقط.</p>
     </section>
 
     <section id="tasbeeh" class="section">
-      <div class="row" style="justify-content:center">
-        <div class="kpi"><div class="label">العدّاد</div><div class="value" id="tasbeehCount">0</div></div>
-      </div>
-      <div class="row" style="justify-content:center;margin-top:8px">
-        <button class="btn" id="tasbeehBtn">اضغط للتسبيح</button>
-        <button class="btn danger" id="tasbeehReset">تصفير</button>
-      </div>
+      <div class="row" style="justify-content:center"><div class="kpi"><div class="label">العدّاد</div><div class="value" id="tasbeehCount">0</div></div></div>
+      <div class="row" style="justify-content:center;margin-top:8px"><button class="btn" id="tasbeehBtn">اضغط للتسبيح</button><button class="btn danger" id="tasbeehReset">تصفير</button></div>
       <p class="small" style="text-align:center">اهتزاز خفيف لكل ضغطة، واهتزاز مميز كل 33.</p>
     </section>
 
-    <section id="resources" class="section">
-      <h3>القرآن الكريم</h3>
+    <section id="quran" class="section">
+      <h3>وصول سريع للقرآن</h3>
       <ul id="resQuran"></ul>
+      <p class="small">مصادر موثوقة للقراءة والتفسير والتلاوة.</p>
+    </section>
+
+    <section id="learning" class="section">
+      <h3>خطط مختصرة</h3>
+      <div id="learnPlan"></div>
+      <h3>مختارات علمية</h3>
+      <ul id="learnCollections"></ul>
+      <h3>تذكيرات</h3>
+      <ul id="learnReminders"></ul>
+    </section>
+
+    <section id="tools" class="section">
+      <h3>حاسبة الزكاة (2.5%)</h3>
+      <p class="small">أدخل النصاب (مثلاً قيمة 85 جرام ذهب) ومبلغ أموالك الزكوية.</p>
+      <div class="row"><input id="nisab" type="number" inputmode="decimal" placeholder="النصاب"/><input id="amount" type="number" inputmode="decimal" placeholder="مبلغ الأموال"/></div>
+      <div class="kpi" style="margin-top:10px"><div class="label">النتيجة</div><div class="value" id="zakatOut">—</div></div>
+      <hr/>
+      <h3>مراجع تقنية</h3>
+      <ul id="resTools"></ul>
+    </section>
+
+    <section id="resources" class="section">
       <h3>الحديث الشريف</h3>
       <ul id="resHadith"></ul>
       <h3>الفتاوى والعلم الشرعي</h3>
@@ -115,21 +130,15 @@
     </section>
 
     <section id="about" class="section">
-      <p>رفيق المسلم: تطبيق ويب بسيط يساعدك على المواقيت والقبلة والأذكار وروابط العلم.</p>
-      <ul>
-        <li>الإصدار: <b id="version2">(انظر أعلى الصفحة)</b></li>
-        <li>المواقيت: أم القرى + العصر حنبلي (ظل مثله)</li>
-        <li>يعمل دون اتصال بعد أول زيارة (PWA)</li>
-      </ul>
-      <p class="small">ملاحظة: قد تختلف مواقيت الصلاة الدقيقة باختلاف الجهة الرسمية بالمدينة (التقويم المحلي). يمكن إضافة ضبط دقائق (tune) لاحقًا.</p>
+      <p>نسخة موسعة تشمل مواقيت/قبلة/أذكار/مسبحة/تعلم/أدوات/روابط.</p>
+      <ul><li>المواقيت: أم القرى + العصر حنبلي (ظل مثله)</li><li>PWA: يعمل دون اتصال بعد أول زيارة</li></ul>
+      <p class="small">قد تختلف المواقيت بدقائق عن التقويم المحلي لبعض المدن.</p>
     </section>
 
   </div>
-
 </main>
 
 <div class="footer">© رفيق المسلم</div>
-
 <script src="./assets/js/app.js" type="module"></script>
 </body>
 </html>

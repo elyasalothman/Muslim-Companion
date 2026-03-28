@@ -1,0 +1,17 @@
+{
+  "version": "0.0.0",
+  "build": "20260328-191810",
+  "calculation": {
+    "method": 4,
+    "school": 0
+  },
+  "timeFormat12h": true,
+  "duha": {
+    "startOffsetAfterSunriseMin": 15,
+    "endOffsetBeforeDhuhrMin": 10
+  },
+  "defaultCity": {
+    "city": "Riyadh",
+    "country": "SA"
+  }
+}

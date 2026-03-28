@@ -1,0 +1,85 @@
+{
+  "quran": [
+    {
+      "title": "Quran.com",
+      "url": "https://quran.com/",
+      "desc": "قراءة القرآن مع تلاوات وترجمات."
+    },
+    {
+      "title": "مشروع المصحف الإلكتروني (آيات) – جامعة الملك سعود",
+      "url": "https://quran.ksu.edu.sa/",
+      "desc": "مصحف وتلاوات وتفاسير وبحث."
+    },
+    {
+      "title": "متصفح القرآن – مجمع الملك فهد (وزارة الشؤون الإسلامية)",
+      "url": "https://quranweb.moia.gov.sa/",
+      "desc": "تصفح مصحف المدينة عبر الويب."
+    },
+    {
+      "title": "مجمع الملك فهد لطباعة المصحف الشريف",
+      "url": "https://qurancomplex.gov.sa/",
+      "desc": "إصدارات المصحف وترجمات وخطوط."
+    },
+    {
+      "title": "QuranEnc – موسوعة ترجمات معاني القرآن",
+      "url": "https://quranenc.com/",
+      "desc": "ترجمات موثوقة لمعاني القرآن بلغات متعددة."
+    },
+    {
+      "title": "Tanzil.net",
+      "url": "https://tanzil.net/",
+      "desc": "نص قرآني مُحقَّق ومصادر للتطوير."
+    }
+  ],
+  "hadith": [
+    {
+      "title": "الموسوعة الحديثية – الدرر السنية",
+      "url": "https://dorar.net/hadith",
+      "desc": "التحقق من صحة الحديث مع تخريج وشروح."
+    },
+    {
+      "title": "Sunnah.com",
+      "url": "https://sunnah.com/",
+      "desc": "كتب الحديث مع بحث وترجمة."
+    },
+    {
+      "title": "الأربعون النووية (Sunnah.com)",
+      "url": "https://sunnah.com/nawawi40",
+      "desc": "متن الأربعين النووية مرتبًا."
+    },
+    {
+      "title": "رياض الصالحين (Sunnah.com)",
+      "url": "https://sunnah.com/riyadussalihin",
+      "desc": "أبواب رياض الصالحين."
+    }
+  ],
+  "fatwa": [
+    {
+      "title": "الموقع الرسمي لسماحة الشيخ ابن باز",
+      "url": "https://binbaz.org.sa/",
+      "desc": "فتاوى ودروس ومواد علمية."
+    },
+    {
+      "title": "الإسلام سؤال وجواب (IslamQA)",
+      "url": "https://islamqa.info/ar",
+      "desc": "فتاوى وإجابات مؤصلة."
+    },
+    {
+      "title": "إسلام ويب – مركز الفتوى",
+      "url": "https://www.islamweb.org/ar/fatawa/index.php",
+      "desc": "أرشيف فتاوى واسع."
+    },
+    {
+      "title": "شبكة الألوكة",
+      "url": "https://www.alukah.net/",
+      "desc": "مقالات وبحوث شرعية."
+    }
+  ],
+  "tools": [
+    {
+      "title": "توثيق AlAdhan API",
+      "url": "https://aladhan.com/prayer-times-api",
+      "desc": "واجهة مواقيت الصلاة."
+    }
+  ]
+}

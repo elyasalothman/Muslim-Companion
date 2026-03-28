@@ -1,0 +1,90 @@
+{
+  "morning": [
+    {
+      "text": "آية الكرسي (البقرة: 255)",
+      "repeat": 1,
+      "source": "صحيح",
+      "ref": "https://dorar.net/hadith/sharh/141083"
+    },
+    {
+      "text": "الإخلاص والمعوذتان",
+      "repeat": 3,
+      "source": "صحيح",
+      "ref": "https://islamqa.info/ar/answers/240793"
+    },
+    {
+      "text": "بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم",
+      "repeat": 3,
+      "source": "صحيح",
+      "ref": "https://islamqa.info/ar/answers/217496"
+    },
+    {
+      "text": "رضيت بالله ربًا وبالإسلام دينًا وبمحمد ﷺ نبيًا",
+      "repeat": 3,
+      "source": "صحيح",
+      "ref": "https://islamqa.info/ar/answers/217496"
+    }
+  ],
+  "evening": [
+    {
+      "text": "آية الكرسي (البقرة: 255)",
+      "repeat": 1,
+      "source": "صحيح",
+      "ref": "https://dorar.net/hadith/sharh/141083"
+    },
+    {
+      "text": "الإخلاص والمعوذتان",
+      "repeat": 3,
+      "source": "صحيح",
+      "ref": "https://islamqa.info/ar/answers/240793"
+    },
+    {
+      "text": "أعوذ بكلمات الله التامات من شر ما خلق",
+      "repeat": 3,
+      "source": "صحيح",
+      "ref": "https://islamqa.info/ar/answers/217496"
+    }
+  ],
+  "sleep": [
+    {
+      "text": "جمع الكفين والنفث وقراءة الإخلاص والمعوذتين ثم مسح الجسد",
+      "repeat": 3,
+      "source": "صحيح",
+      "ref": "https://dorar.net/hadith/sharh/3632"
+    },
+    {
+      "text": "آية الكرسي",
+      "repeat": 1,
+      "source": "صحيح",
+      "ref": "https://dorar.net/hadith/sharh/141083"
+    },
+    {
+      "text": "آخر آيتين من سورة البقرة (285–286)",
+      "repeat": 1,
+      "source": "صحيح",
+      "ref": "https://islamqa.info/ar/answers/240793"
+    }
+  ],
+  "afterPrayer": [
+    {
+      "text": "أستغفر الله (ثلاثًا) ثم: اللهم أنت السلام ومنك السلام تباركت يا ذا الجلال والإكرام",
+      "repeat": 1,
+      "source": "صحيح",
+      "ref": "https://islamport.com/l/fqh/3397/108.htm"
+    }
+  ],
+  "daily": [
+    {
+      "text": "عند الخروج: بسم الله، توكلت على الله، ولا حول ولا قوة إلا بالله",
+      "repeat": 1,
+      "source": "حصن المسلم",
+      "ref": "https://sunnah.com/"
+    },
+    {
+      "text": "عند دخول المنزل: بسم الله ولجنا وبسم الله خرجنا وعلى ربنا توكلنا",
+      "repeat": 1,
+      "source": "حصن المسلم",
+      "ref": "https://sunnah.com/"
+    }
+  ]
+}
