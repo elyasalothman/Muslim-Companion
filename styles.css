@@ -1,0 +1,31 @@
+:root{--primary:#1a5e3a;--secondary:#27ae60;--bg:#f4f7f6;--card:#fff;--text:#2c3e50;--muted:#7f8c8d;--border:#e0e0e0}
+[data-theme="dark"]{--primary:#2ecc71;--secondary:#27ae60;--bg:#121212;--card:#1e1e1e;--text:#e0e0e0;--muted:#aaaaaa;--border:#333}
+*{box-sizing:border-box}html,body{margin:0;padding:0}body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:48px}
+header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--primary);font-weight:700}
+.toolbar button{border:none;background:transparent;color:var(--text);cursor:pointer;font-size:18px;margin-inline-start:10px}
+.dashboard{max-width:900px;margin:16px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:0 12px}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.info-card h3{margin:0 0 8px 0;color:var(--muted);font-size:14px}
+.info-card p{margin:0;font-weight:700;color:var(--primary)}
+.nav-container{max-width:900px;margin:8px auto;display:flex;gap:8px;overflow:auto;padding:0 12px}
+.nav-btn{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.nav-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.section{display:none;max-width:900px;margin:12px auto;padding:0 12px}
+.section.active{display:block}
+.section-title{text-align:center;color:var(--primary)}
+.dhikr-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin:12px 0}
+.dhikr-text{font-size:1.2rem;line-height:1.9;text-align:justify;margin:0}
+.source{display:block;color:var(--muted);font-size:.9rem;margin-top:8px}
+.progress-bar-container{width:100%;height:6px;background:#ecf0f1;border-radius:3px;margin-top:12px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:var(--secondary);transition:width .3s}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.action-row{display:flex;align-items:center;gap:8px}
+.btn{background:var(--primary);color:#fff;border:none;border-radius:24px;padding:10px 16px;cursor:pointer}
+.btn.secondary{background:var(--secondary)}
+.prayer-time{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--card);margin:8px 0}
+.prayer-time.next{border-right:5px solid var(--secondary);background:rgba(39,174,96,.06)}
+.rosary-wrap{text-align:center;padding:20px}
+.rosary-display{font-size:3rem;color:var(--primary);font-family:monospace}
+.rosary-btn{width:180px;height:180px;border-radius:50%;border:none;color:#fff;background:linear-gradient(135deg,var(--primary),var(--secondary));box-shadow:0 10px 20px rgba(0,0,0,.15);font-size:1.6rem;cursor:pointer}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
