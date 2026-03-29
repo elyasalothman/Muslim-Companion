@@ -1,4 +1,4 @@
-// Rafiq Muslim v0.6.1 - Fit layout & Fixes
+// Rafiq Muslim v0.6.2 - Scrolling re-enabled & Layout fix
 const API_BASE='https://api.aladhan.com/v1';
 const KAABA={lat:21.4225,lon:39.8262};
 const BDC_REVERSE='https://api-bdc.net/data/reverse-geocode-client';
@@ -7,7 +7,7 @@ const LS = (k,v) => { try { if(v===undefined) return localStorage.getItem(k); lo
 
 let CFG=null, nextTimer=null; let loaded={adhkar:false,resources:false,learning:false};
 let rawAdhkarData=null; let showTashkeel=LS('tashkeel')!=='false'; 
-let currentFontSize = parseFloat(LS('fontSize')); if(isNaN(currentFontSize)) currentFontSize = 1.4; // تناسب الشاشة أكثر
+let currentFontSize = parseFloat(LS('fontSize')); if(isNaN(currentFontSize)) currentFontSize = 1.5;
 
 const TASBEEH_PHRASES=[{"name": "سُبْحَانَ اللَّهِ", "target": 33}, {"name": "الْحَمْدُ لِلَّهِ", "target": 33}, {"name": "اللَّهُ أَكْبَرُ", "target": 34}, {"name": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "target": 100}, {"name": "لَا إِلَهَ إِلَّا اللَّهُ", "target": 100}, {"name": "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", "target": 100}, {"name": "أَسْتَغْفِرُ اللَّهَ", "target": 100}];
 
@@ -73,7 +73,7 @@ function initNav(){
     const id=btn.dataset.target; showSection(id); 
     if(id==='adhkar'&&!loaded.adhkar){loaded.adhkar=true; await loadAdhkar();} 
     if(id==='learning'&&!loaded.learning){loaded.learning=true; await Promise.all([loadLearning(), loadResources(), loadDailyBenefit()]);} 
-    qs('main').scrollTo({top:0,behavior:'smooth'});
+    window.scrollTo({top:0,behavior:'smooth'});
   }));
 }
 
@@ -202,27 +202,18 @@ async function loadAdhkar(){
 }
 
 async function loadDailyBenefit() {
-  const fallback = [
-    "من لزم الاستغفار جعل الله له من كل هم فرجاً، ومن كل ضيق مخرجاً.",
-    "صلاة الضحى تعدل صدقة عن كل مفصل من مفاصل جسمك (360 مفصلاً).",
-    "أحب الأعمال إلى الله أدومها وإن قل، فقليل دائم خير من كثير منقطع.",
-    "كلمتان خفيفتان على اللسان ثقيلتان في الميزان: سبحان الله وبحمده، سبحان الله العظيم."
-  ];
+  const fallback = ["من لزم الاستغفار جعل الله له من كل هم فرجاً، ومن كل ضيق مخرجاً."];
   let benefits = fallback;
   try {
     const res = await fetch('./data/benefits.json');
-    if(res.ok) {
-       benefits = await res.json();
-       LS('cached_benefits', JSON.stringify(benefits));
-    } else throw new Error();
+    if(res.ok) { benefits = await res.json(); LS('cached_benefits', JSON.stringify(benefits)); } 
+    else throw new Error();
   } catch(e) {
-    const cached = LS('cached_benefits');
-    if(cached) benefits = JSON.parse(cached);
+    const cached = LS('cached_benefits'); if(cached) benefits = JSON.parse(cached);
   }
   const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
   const todayBenefit = benefits[dayOfYear % benefits.length];
-  const container = qs('#dailyBenefitContent');
-  if(container) container.textContent = todayBenefit;
+  const container = qs('#dailyBenefitContent'); if(container) container.textContent = todayBenefit;
 }
 
 async function loadResources(){const data = await fetchJSON('./data/resources.json', {useful:[]}); const host=qs('#usefulLinks'); if(!host) return; host.innerHTML=''; (data.useful||[]).forEach(g=>{const sec=document.createElement('div'); sec.className='pager-card'; sec.innerHTML=`<h3 class="section-title">${g.group}</h3>`; const ul=document.createElement('ul'); ul.className='custom-list'; (g.items||[]).forEach(it=>{const li=document.createElement('li'); li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a> <span class="small" style="display:block; margin-top:4px;">${it.desc||''}</span>`; ul.appendChild(li);}); sec.appendChild(ul); host.appendChild(sec);});}
