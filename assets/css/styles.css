@@ -2,48 +2,45 @@
 
 :root, [data-scheme='brown'] {
   --bg: #2b221a; --bg2: #3a2e24; --card: #3a2e24; --fg: #fdf5e6; 
-  --muted: #d4c4b7; --accent: #d4af37; --accent2: #b8860b; --danger: #e63946; 
+  --muted: #d4c4b7; --accent: #d4af37; --danger: #e63946; 
   --border: rgba(212, 175, 55, 0.35); --radius: 12px; 
 }
-[data-scheme='black'] { --bg: #000000; --bg2: #141414; --fg: #ffffff; --muted: #aaaaaa; --accent: #ffffff; --border: #333333; --radius: 4px; }
 
-body{
-  margin:0; font-family: 'Cairo', sans-serif; background:var(--bg); color:var(--fg);
-  overflow-y: auto; overflow-x: hidden; line-height: 1.6;
+body {
+  margin: 0; font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--fg);
+  overflow-y: auto; overflow-x: hidden; line-height: 1.6; padding-bottom: 100px;
 }
 
-header{ position: fixed; top: 0; left: 0; right: 0; background:var(--bg2); border-bottom:1px solid var(--border); z-index: 1000; backdrop-filter: blur(14px); }
-.header-wrap{ padding:14px 18px; display:flex; align-items:center; }
-.brand{ display:flex; align-items:center; font-weight:900; font-size:1.4rem; gap:12px; }
-#appLogo{ width:34px; height:34px; }
+header { position: fixed; top: 0; left: 0; right: 0; background: var(--bg2); border-bottom: 1px solid var(--border); z-index: 1000; }
+.header-wrap { padding: 14px 18px; display: flex; align-items: center; }
+.brand { display: flex; align-items: center; font-weight: 900; font-size: 1.5rem; }
 
-main{ width:100%; padding:85px 12px 145px; display:grid; gap:18px; }
-.card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:22px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+main { padding: 85px 12px 20px; display: block; }
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
-.kpi .label{ color:var(--muted); font-size:0.95rem; font-weight:700; }
-.kpi .value{ font-size:1.6rem; font-weight:900; color:var(--accent); }
-#nextCountdown{ font-size:3.2rem; font-weight:900; color:var(--accent2); font-family: Arial; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.kpi .label { color: var(--muted); font-size: 0.95rem; font-weight: 700; }
+.kpi .value { font-size: 1.4rem; font-weight: 900; color: var(--accent); }
 
-.table{ width:100%; border-collapse:collapse; margin-top:14px; background:var(--bg); border-radius:var(--radius); overflow:hidden; }
-.table th, .table td{ padding:14px 8px; border-bottom:1px solid var(--border); font-weight:700; text-align: center; }
-.current-prayer { background: rgba(212,175,55,0.15); border-right: 5px solid var(--accent); }
+.table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.table th, .table td { padding: 14px 8px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 1.1rem; }
+.table th { color: var(--muted); }
 
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--border); display: flex; z-index: 1000; }
-.bottom-nav button { background: var(--bg); border: none; border-left: 1px solid var(--border); flex: 1; font-size: 2.2rem; padding: 22px 0; cursor: pointer; filter: grayscale(100%) opacity(0.5); }
-.bottom-nav button.active { background: var(--accent); filter: grayscale(0%) opacity(1); }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--border); display: flex; z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 0px); }
+.bottom-nav button { background: transparent; color: var(--fg); border: none; border-left: 1px solid var(--border); flex: 1; font-size: 2rem; padding: 18px 0; cursor: pointer; opacity: 0.4; transition: 0.2s; }
+.bottom-nav button.active { opacity: 1; color: var(--accent); border-bottom: 4px solid var(--accent); }
 
-.accuracy-box { padding: 12px; text-align: center; margin-top: 18px; font-weight: 700; border: 1px dashed var(--border); border-radius: var(--radius); }
-.acc-high { color: #4caf50; border-color: #4caf50; }
-.acc-med { color: #ff9800; border-color: #ff9800; }
-.acc-low { color: var(--danger); border-color: var(--danger); animation: blink 1s infinite; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-.pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 15px 0; }
-.pills button { background: var(--bg); color: var(--fg); border: 1px solid var(--border); padding: 10px; border-radius: var(--radius); font-weight: 700; }
-.pills button.active { background: var(--accent2); color: #fff; }
-
-.section { display: none; }
+.section { display: none; animation: fadeIn 0.3s ease; }
 .section.active { display: block; }
-.btn { background: var(--accent); color: var(--bg); padding: 14px; border-radius: var(--radius); border: none; font-weight: 900; cursor: pointer; font-family: 'Cairo'; }
-.btn.secondary { background: var(--bg); color: var(--fg); border: 1px solid var(--border); }
-.version-tag { text-align: center; font-weight: 900; color: var(--muted); margin-top: 20px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.btn { background: var(--accent); color: var(--bg); padding: 14px; border-radius: var(--radius); border: none; font-weight: 900; cursor: pointer; font-family: 'Cairo'; font-size: 1.1rem; }
+.btn.secondary { background: transparent; color: var(--fg); border: 1px solid var(--border); }
+
+/* المسبحة */
+.tasbeeh-btn { width: 150px; height: 150px; border-radius: 50%; background: var(--accent); color: var(--bg); font-size: 2rem; font-weight: 900; border: 5px solid var(--bg2); box-shadow: 0 0 0 3px var(--accent); cursor: pointer; font-family: 'Cairo'; }
+.tasbeeh-btn:active { transform: scale(0.95); }
+
+/* البوصلة */
+.compass { width: 200px; height: 200px; border-radius: 50%; border: 4px solid var(--accent); position: relative; }
+.compass .needle { position: absolute; top: 50%; left: 50%; width: 4px; height: 100px; background: var(--danger); transform-origin: bottom center; transform: translate(-50%, -100%) rotate(0deg); border-radius: 4px 4px 0 0; transition: transform 0.1s; }
