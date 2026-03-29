@@ -1,26 +1,30 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-theme="dark" data-scheme="brown">
+<html lang="ar" dir="rtl" data-scheme="brown">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <meta name="theme-color" content="#1a1410"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <link rel="icon" href="./assets/img/icon-192.png"/>
-  <link rel="stylesheet" href="./assets/css/styles.css?v=0.3.1"/>
+  <link rel="stylesheet" href="./assets/css/styles.css?v=0.4.0"/>
   <title>رفيق المسلم</title>
 </head>
 <body>
 <header>
   <div class="header-wrap">
     <div class="brand"><img src="./assets/img/logo.svg" alt=""/><span>رفيق المسلم</span></div>
-    <div class="toolbar" style="display: flex; gap: 12px; align-items: center;">
-      <div style="display: flex; gap: 8px;">
-        <button class="color-dot" data-val="white" style="background-color: #f8f9fa;" title="ورقي (أبيض)"></button>
-        <button class="color-dot" data-val="black" style="background-color: #141414;" title="مسطح (أسود)"></button>
-        <button class="color-dot" data-val="brown" style="background-color: #8b5e34;" title="كلاسيكي (بني)"></button>
-        <button class="color-dot" data-val="gray" style="background-color: #70757a;" title="زجاجي (رصاصي)"></button>
+    <div class="toolbar" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+      <div style="display: flex; gap: 8px; margin-left: 10px;">
+        <button class="color-dot" data-val="white" style="background-color: #f8f9fa;" title="أبيض"></button>
+        <button class="color-dot" data-val="black" style="background-color: #141414;" title="أسود"></button>
+        <button class="color-dot" data-val="brown" style="background-color: #8b5e34;" title="كلاسيكي"></button>
+        <button class="color-dot" data-val="gray" style="background-color: #70757a;" title="رصاصي"></button>
+        <button class="color-dot" data-val="colorful" style="background: linear-gradient(45deg, #e83e8c, #6f42c1);" title="ملون"></button>
       </div>
-      <button id="toggleTheme" title="الوضع الليلي/النهاري" style="font-size: 1.3rem; background: transparent; border: none; padding: 0; min-height: auto;">🌙</button>
+      <button id="toggleTashkeel" title="إخفاء/إظهار التشكيل" class="tool-btn">بَ/ب</button>
+      <button id="btnTextInc" title="تكبير الخط" class="tool-btn">A+</button>
+      <button id="btnTextDec" title="تصغير الخط" class="tool-btn">A-</button>
+      <button id="btnNotify" title="تفعيل التنبيهات" class="tool-btn">🔔</button>
     </div>
   </div>
 </header>
@@ -28,8 +32,12 @@
 <main>
   <div class="card">
     <div class="grid">
-      <div class="kpi"><div class="label">التاريخ الهجري</div><div class="value secondary" id="hijri">—</div></div>
-      <div class="kpi"><div class="label">الصلاة القادمة</div><div class="value"><span id="nextPrayerName">—</span> <span class="small">(</span><span id="nextPrayerTime">—</span><span class="small">)</span></div><div id="nextCountdown" style="direction: ltr;">—</div></div>
+      <div class="kpi">
+        <div class="label">التاريخ الهجري</div>
+        <div class="value secondary" id="hijri">—</div>
+        <div id="fastingReminder" class="small" style="color: var(--accent); font-weight: bold; margin-top: 6px;"></div>
+      </div>
+      <div class="kpi"><div class="label">الصلاة القادمة</div><div class="value"><span id="nextPrayerName">—</span> <span>(</span><span id="nextPrayerTime">—</span><span>)</span></div><div id="nextCountdown" style="direction: ltr;">—</div></div>
       <div class="kpi"><div class="label">المدينة</div><div class="value" id="cityDisplay">—</div><div class="small" id="ptMeta"></div></div>
     </div>
   </div>
@@ -39,6 +47,15 @@
       <div class="row" id="locationControls" style="display: flex; flex-wrap: nowrap; gap: 8px;">
         <button class="btn" id="useLocation" title="تحديد موقعي التلقائي" style="padding: 0 16px; font-size: 1.4rem;">📍</button>
         <select id="citySelect" style="flex: 1;"><option value="">— اختر مدينة يدوياً —</option></select>
+      </div>
+      <div class="row" style="margin-top: 8px;">
+        <select id="hijriAdjSelect" style="flex: 1;">
+          <option value="-2">التاريخ الهجري: تقديم يومين (-٢)</option>
+          <option value="-1">التاريخ الهجري: تقديم يوم (-١)</option>
+          <option value="0" selected>التاريخ الهجري: دقيق (مطابق للتقويم)</option>
+          <option value="1">التاريخ الهجري: تأخير يوم (+١)</option>
+          <option value="2">التاريخ الهجري: تأخير يومين (+٢)</option>
+        </select>
       </div>
       <div class="small" id="ptStatus" style="margin-top: 6px; text-align: center;"></div>
 
@@ -52,19 +69,19 @@
             </tr>
           </thead>
           <tbody>
-            <tr id="tr_Fajr"><th>الفجر</th><td id="t_fajr_s" style="text-align: center; font-weight: bold;">—</td><td id="t_fajr_e" class="small" style="text-align: center;">—</td></tr>
-            <tr class="minor" id="tr_Duha"><th>الضحى</th><td id="t_duha_s" style="text-align: center; font-weight: bold;">—</td><td id="t_duha_e" class="small" style="text-align: center;">—</td></tr>
-            <tr id="tr_Dhuhr"><th>الظهر</th><td id="t_dhuhr_s" style="text-align: center; font-weight: bold;">—</td><td id="t_dhuhr_e" class="small" style="text-align: center;">—</td></tr>
-            <tr id="tr_Asr"><th>العصر</th><td id="t_asr_s" style="text-align: center; font-weight: bold;">—</td><td id="t_asr_e" class="small" style="text-align: center;">—</td></tr>
-            <tr id="tr_Maghrib"><th>المغرب</th><td id="t_maghrib_s" style="text-align: center; font-weight: bold;">—</td><td id="t_maghrib_e" class="small" style="text-align: center; color: var(--accent2); font-weight: bold;">—</td></tr>
+            <tr id="tr_Fajr"><th>الفجر</th><td id="t_fajr_s" style="text-align: center;">—</td><td id="t_fajr_e" style="text-align: center;">—</td></tr>
+            <tr class="minor" id="tr_Duha"><th>الضحى</th><td id="t_duha_s" style="text-align: center;">—</td><td id="t_duha_e" style="text-align: center;">—</td></tr>
+            <tr id="tr_Dhuhr"><th>الظهر</th><td id="t_dhuhr_s" style="text-align: center;">—</td><td id="t_dhuhr_e" style="text-align: center;">—</td></tr>
+            <tr id="tr_Asr"><th>العصر</th><td id="t_asr_s" style="text-align: center;">—</td><td id="t_asr_e" style="text-align: center;">—</td></tr>
+            <tr id="tr_Maghrib"><th>المغرب</th><td id="t_maghrib_s" style="text-align: center;">—</td><td id="t_maghrib_e" style="text-align: center;">—</td></tr>
             <tr id="tr_Isha"><th>العشاء</th>
-              <td style="text-align: center; font-weight: bold;">
+              <td style="text-align: center;">
                 <div id="t_isha_s">—</div>
-                <div class="small" style="font-weight: normal; margin-top: 4px; color: var(--muted); font-size: 0.85rem;">فعلي: <span id="t_isha_true_s">—</span></div>
+                <div style="margin-top: 4px;">فعلي: <span id="t_isha_true_s">—</span></div>
               </td>
-              <td id="t_isha_e" class="small" style="text-align: center;">—</td>
+              <td id="t_isha_e" style="text-align: center;">—</td>
             </tr>
-            <tr class="minor" id="tr_Lastthird"><th>الثلث الأخير</th><td id="t_lastthird_s" style="text-align: center; font-weight: bold;">—</td><td id="t_lastthird_e" class="small" style="text-align: center;">—</td></tr>
+            <tr class="minor" id="tr_Lastthird"><th>الثلث الأخير</th><td id="t_lastthird_s" style="text-align: center;">—</td><td id="t_lastthird_e" style="text-align: center;">—</td></tr>
           </tbody>
         </table>
       </div>
@@ -85,6 +102,7 @@
 
     <section id="adhkar" class="section">
       <div id="adhkarPills" class="pills"></div>
+      <div class="progress" style="margin-bottom: 16px; height: 12px; border-radius: 6px;"><div id="globalAdhkarProgress" style="width:0; background:var(--accent);"></div></div>
       <div id="adhkarContainer"></div>
     </section>
 
@@ -101,7 +119,6 @@
         </div>
         <div class="tasbeeh-main-btn-wrap"><button class="tasbeeh-btn" id="tasbeehBtn">سَبِّح الآن</button></div>
         <div class="tasbeeh-secondary-row"><button class="btn danger tasbeeh-reset-small" id="tasbeehReset">تصفير</button></div>
-        <div class="small" id="tasbeehHint">اهتزاز خفيف مع كل ضغطة، واهتزاز أوضح عند إكمال الهدف</div>
       </div>
     </section>
 
@@ -113,6 +130,9 @@
 
     <section id="resources" class="section">
       <div id="usefulLinks"></div>
+      <div class="version-info" style="text-align: center; padding: 40px 10px; color: var(--muted); font-size: 1.1rem; font-family: Arial, sans-serif;">
+        الإصدار 0.4.0
+      </div>
     </section>
   </div>
 </main>
@@ -120,10 +140,6 @@
 <div id="updateBar">
   <div class="msg">تحديث جديد متوفر</div>
   <div class="row" style="margin:0"><button class="btn" id="updateNow">تحديث الآن</button><button class="btn secondary" id="updateLater">لاحقًا</button></div>
-</div>
-
-<div class="tiny-footer">
-  رفيق المسلم - الإصدار 0.3.1
 </div>
 
 <nav class="bottom-nav">
@@ -135,6 +151,6 @@
   <button data-target="resources" title="روابط">🔗</button>
 </nav>
 
-<script src="./assets/js/app.js?v=0.3.1" type="module"></script>
+<script src="./assets/js/app.js?v=0.4.0" type="module"></script>
 </body>
 </html>
