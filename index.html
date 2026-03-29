@@ -1,1 +1,132 @@
-<!doctype html><html lang="ar" dir="rtl" data-theme="dark" data-scheme="brown"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="theme-color" content="#1a1410"/><link rel="manifest" href="./manifest.webmanifest"/><link rel="icon" href="./assets/img/icon-192.png"/><link rel="stylesheet" href="./assets/css/styles.css"/><title>رفيق المسلم</title></head><body><header><div class="header-wrap"><div class="brand"><img src="./assets/img/logo.svg" alt=""/><span>رفيق المسلم</span></div><div class="toolbar"><select id="schemeSelect"><option value="brown">بني كلاسيكي</option><option value="olive">زيتوني</option><option value="teal">تركوازي</option><option value="indigo">نيلي</option></select><button id="toggleTheme">☯</button></div></div></header><main><div class="card"><div class="grid"><div class="kpi"><div class="label">التاريخ الهجري</div><div class="value secondary" id="hijri">—</div></div><div class="kpi"><div class="label">الصلاة القادمة</div><div class="value"><span id="nextPrayerName">—</span> <span class="small">(</span><span id="nextPrayerTime">—</span><span class="small">)</span></div><div id="nextCountdown">—</div></div><div class="kpi"><div class="label">المدينة</div><div class="value" id="cityDisplay">—</div><div class="small" id="ptMeta"></div></div></div></div><div class="card"><div class="nav"><button class="active" data-target="times">المواقيت</button><button data-target="qibla">القبلة</button><button data-target="adhkar">الأذكار</button><button data-target="tasbeeh">المسبحة</button><button data-target="learning">تعلم</button><button data-target="tools">أدوات</button><button data-target="resources">روابط مفيدة</button><button data-target="about">عن</button></div><section id="times" class="section active"><div class="row"><button class="btn" id="useLocation">تحديد موقعي</button><span class="badge" id="locChip" style="display:none">الموقع مفعل ✓</span><div id="cityControls" class="row" style="margin:0"><select id="citySelect"><option value="">— اختر مدينة —</option></select><button class="btn secondary" id="useCity">استخدام المدينة</button></div></div><div class="small" id="ptStatus"></div><div class="row" style="margin-top:10px"><span class="badge">طريقة الحساب: أم القرى</span><span class="badge">الوقت: 12 ساعة</span></div><div class="table-wrap"><table class="table" style="margin-top:10px"><tr><th>الفجر</th><td id="t_fajr">—</td></tr><tr class="minor"><th>الشروق</th><td id="t_sunrise">—</td></tr><tr><th>الضحى</th><td id="t_duha">—</td></tr><tr><th>الظهر</th><td id="t_dhuhr">—</td></tr><tr><th>العصر</th><td id="t_asr">—</td></tr><tr><th>المغرب</th><td id="t_maghrib">—</td></tr><tr><th>العشاء</th><td id="t_isha">—</td></tr><tr class="minor"><th>الثلث الأخير</th><td id="t_lastthird">—</td></tr></table></div><p class="small" style="margin:10px 0 0">الضحى: (الشروق + 15 دقيقة) إلى (قبل الظهر بـ 10 دقائق). الثلث الأخير محسوب من المغرب إلى فجر الغد.</p></section><section id="qibla" class="section"><p>زاوية القبلة (من الشمال الحقيقي): <b id="qiblaDeg">—</b></p><div class="compass"><div class="dial"></div><div id="needle" class="needle"></div></div><div class="row"><button class="btn" id="enableCompass">تفعيل البوصلة</button><span class="small" id="compassStatus"></span></div><div class="small" id="compassAccuracy"></div></section><section id="adhkar" class="section"><p class="small">تم ترتيب أذكار النوم بطريقة تقليب بطاقة واحدة لتكون أوضح مع كبر الخط، وتمت إضافة سورة الملك في آخرها مع فضلها.</p><div id="adhkarPills" class="pills"></div><div id="adhkarContainer"></div></section><section id="tasbeeh" class="section"><div class="tasbeeh-wrap"><div class="tasbeeh-meta"><select id="tasbeehPhraseSelect" aria-label="اختيار التسبيح"></select><button class="btn secondary" id="tasbeehNext">التالي</button></div><div class="current-tasbeeh" id="currentTasbeeh">سُبْحَانَ اللَّهِ</div><div class="tasbeeh-kpi"><div class="card" style="padding:16px"><div class="kpi"><div class="label">العدّاد</div><div class="tasbeeh-counter" id="tasbeehCount">0</div></div></div><div class="card" style="padding:16px"><div class="kpi"><div class="label">الهدف</div><div class="tasbeeh-target" id="tasbeehTarget">الهدف: 33</div></div></div></div><button class="tasbeeh-btn" id="tasbeehBtn">سَبِّح الآن</button><div class="tasbeeh-controls"><button class="btn danger" id="tasbeehReset">تصفير</button><button class="btn secondary" id="tasbeehNext2" style="display:none">التالي</button></div><div class="small" id="tasbeehHint">اهتزاز خفيف مع كل ضغطة، واهتزاز أوضح عند إكمال الهدف</div></div></section><section id="learning" class="section"><h3>خطط مختصرة</h3><div id="learnPlan"></div><h3>مختارات علمية</h3><ul id="learnCollections"></ul><h3>تذكيرات</h3><ul id="learnReminders"></ul></section><section id="tools" class="section"><h3>حاسبة الزكاة (2.5%)</h3><div class="row"><input id="nisab" type="number" inputmode="decimal" placeholder="النصاب"/><input id="amount" type="number" inputmode="decimal" placeholder="مبلغ الأموال"/></div><div class="kpi" style="margin-top:10px"><div class="label">النتيجة</div><div class="value" id="zakatOut">—</div></div></section><section id="resources" class="section"><div id="usefulLinks"></div></section><section id="about" class="section"><p>الإصدار 0.2: حذف بند الإسراء والزمر من أذكار النوم، ووضع سورة الملك في آخر أذكار النوم مع فضلها، وجعل بطاقات النوم تقليب بطاقة واحدة لخط أوضح وترتيب أفضل.</p><ul><li>الإصدار: 0.2</li></ul></section></div></main><div id="updateBar"><div class="msg">تحديث جديد متوفر</div><div class="row" style="margin:0"><button class="btn" id="updateNow">تحديث الآن</button><button class="btn secondary" id="updateLater">لاحقًا</button></div></div><div class="fixed-footer"><div class="footer-brand" id="footerBrand">رفيق المسلم</div><div class="footer-version" id="footerVersion">الإصدار 0.2</div></div><script src="./assets/js/app.js" type="module"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark" data-scheme="brown">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="theme-color" content="#1a1410"/>
+  <link rel="manifest" href="./manifest.webmanifest"/>
+  <link rel="icon" href="./assets/img/icon-192.png"/>
+  <link rel="stylesheet" href="./assets/css/styles.css"/>
+  <title>رفيق المسلم</title>
+</head>
+<body>
+  <header>
+    <div class="header-wrap">
+      <div class="brand"><img src="./assets/img/logo.svg" alt=""/><span>رفيق المسلم</span></div>
+      <div class="toolbar">
+        <select id="schemeSelect">
+          <option value="brown">بني كلاسيكي</option>
+          <option value="olive">زيتوني</option>
+          <option value="teal">تركوازي</option>
+          <option value="indigo">نيلي</option>
+        </select>
+        <button id="toggleTheme">☯</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="grid">
+        <div class="kpi">
+          <div class="label">التاريخ الهجري</div>
+          <div class="value secondary" id="hijri">—</div>
+        </div>
+        <div class="kpi">
+          <div class="label">الصلاة القادمة</div>
+          <div class="value"><span id="nextPrayerName">—</span> <span class="small">(</span><span id="nextPrayerTime">—</span><span class="small">)</span></div>
+          <div id="nextCountdown">—</div>
+        </div>
+        <div class="kpi">
+          <div class="label">المدينة</div>
+          <div class="value" id="cityDisplay">—</div>
+          <div class="small" id="ptMeta"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="nav">
+        <button class="active" data-target="times">المواقيت</button>
+        <button data-target="qibla">القبلة</button>
+        <button data-target="adhkar">الأذكار</button>
+        <button data-target="tasbeeh">المسبحة</button>
+        <button data-target="learning">تعلم</button>
+        <button data-target="resources">روابط مفيدة</button>
+      </div>
+
+      <section id="times" class="section active">
+        <div class="row">
+          <button class="btn" id="useLocation">تحديد موقعي</button>
+          <span class="badge" id="locChip" style="display:none">الموقع مفعل ✓</span>
+          <div id="cityControls" class="row" style="margin:0">
+            <select id="citySelect"><option value="">— اختر مدينة —</option></select>
+            <button class="btn secondary" id="useCity">استخدام المدينة</button>
+          </div>
+        </div>
+        <div class="small" id="ptStatus"></div>
+        <div class="row" style="margin-top:10px"><span class="badge">طريقة الحساب: أم القرى</span><span class="badge">الوقت: 12 ساعة</span></div>
+        <div class="table-wrap">
+          <table class="table" style="margin-top:10px">
+            <tr><th>الفجر</th><td id="t_fajr">—</td></tr>
+            <tr class="minor"><th>الشروق</th><td id="t_sunrise">—</td></tr>
+            <tr><th>الضحى</th><td id="t_duha">—</td></tr>
+            <tr><th>الظهر</th><td id="t_dhuhr">—</td></tr>
+            <tr><th>العصر</th><td id="t_asr">—</td></tr>
+            <tr><th>المغرب</th><td id="t_maghrib">—</td></tr>
+            <tr><th>العشاء</th><td id="t_isha">—</td></tr>
+            <tr class="minor"><th>الثلث الأخير</th><td id="t_lastthird">—</td></tr>
+          </table>
+        </div>
+        <p class="small" style="margin:10px 0 0">الضحى: (الشروق + 15 دقيقة) إلى (قبل الظهر بـ 10 دقائق). الثلث الأخير محسوب من المغرب إلى فجر الغد.</p>
+      </section>
+
+      <section id="qibla" class="section">
+        <p>زاوية القبلة (من الشمال الحقيقي): <b id="qiblaDeg">—</b></p>
+        <div class="compass"><div class="dial"></div><div id="needle" class="needle"></div></div>
+        <div class="row"><button class="btn" id="enableCompass">تفعيل البوصلة</button><span class="small" id="compassStatus"></span></div>
+        <div class="small" id="compassAccuracy"></div>
+      </section>
+
+      <section id="adhkar" class="section">
+        <p class="small">نسخة 0.2.1 الكاملة: الأذكار الموسعة عادت كاملة، وتم تعديل قسم النوم فقط ليكون أوضح على الجوال. سورة الملك تظهر كاملة داخل بطاقتها، مع بطاقة مستقلة لفضلها.</p>
+        <div id="adhkarPills" class="pills"></div>
+        <div id="adhkarContainer"></div>
+      </section>
+
+      <section id="tasbeeh" class="section">
+        <div class="tasbeeh-wrap">
+          <div class="tasbeeh-meta"><select id="tasbeehPhraseSelect" aria-label="اختيار التسبيح"></select><button class="btn secondary" id="tasbeehNext">التالي</button></div>
+          <div class="current-tasbeeh" id="currentTasbeeh">سُبْحَانَ اللَّهِ</div>
+          <div class="tasbeeh-kpi">
+            <div class="card" style="padding:16px"><div class="kpi"><div class="label">العدّاد</div><div class="tasbeeh-counter" id="tasbeehCount">0</div></div></div>
+            <div class="card" style="padding:16px"><div class="kpi"><div class="label">الهدف</div><div class="tasbeeh-target" id="tasbeehTarget">الهدف: 33</div></div></div>
+          </div>
+          <button class="tasbeeh-btn" id="tasbeehBtn">سَبِّح الآن</button>
+          <div class="tasbeeh-controls"><button class="btn danger" id="tasbeehReset">تصفير</button><button class="btn secondary" id="tasbeehNext2" style="display:none">التالي</button></div>
+          <div class="small" id="tasbeehHint">اهتزاز خفيف مع كل ضغطة، واهتزاز أوضح عند إكمال الهدف</div>
+        </div>
+      </section>
+
+      <section id="learning" class="section">
+        <h3>خطط مختصرة</h3>
+        <div id="learnPlan"></div>
+        <h3>مختارات علمية</h3>
+        <ul id="learnCollections"></ul>
+        <h3>تذكيرات</h3>
+        <ul id="learnReminders"></ul>
+      </section>
+
+      <section id="resources" class="section"><div id="usefulLinks"></div></section>
+    </div>
+  </main>
+
+  <div id="updateBar">
+    <div class="msg">تحديث جديد متوفر</div>
+    <div class="row" style="margin:0"><button class="btn" id="updateNow">تحديث الآن</button><button class="btn secondary" id="updateLater">لاحقًا</button></div>
+  </div>
+
+  <div class="fixed-footer"><div class="footer-brand" id="footerBrand">رفيق المسلم</div><div class="footer-version" id="footerVersion">الإصدار 0.2.1</div></div>
+  <script src="./assets/js/app.js" type="module"></script>
+</body>
+</html>
