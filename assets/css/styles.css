@@ -43,12 +43,12 @@
 html,body{margin:0;padding:0;overflow-x:hidden}
 body{
   font-family: 'Amiri', serif;
-  font-size: 1.1rem;
+  font-size: 1.15rem; /* تكبير بسيط للخط العام */
   text-rendering:optimizeLegibility;
   background:var(--bg);
   color:var(--fg);
   padding-top:70px !important;
-  padding-bottom:95px !important; /* مساحة لعدم تغطية المحتوى بالشريط السفلي */
+  padding-bottom:110px !important; /* مساحة لعدم تغطية المحتوى بالشريط والفوتر */
 }
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;opacity:var(--pattern-op);
@@ -80,7 +80,6 @@ header{
 }
 .color-dot:hover { border-color: var(--accent) !important; transform: scale(1.1); }
 
-/* جعل المحتوى يعرض الشاشة بالكامل */
 main{
   width:100%; max-width:100%; padding:8px 6px; display:grid; gap:12px; margin:0;
 }
@@ -112,7 +111,6 @@ main{
 .table tr.minor th,.table tr.minor td{font-size:14px;color:var(--muted)}
 .small{font-size:14px;color:var(--muted);overflow-wrap:anywhere}
 
-/* تظليل الصلاة الحالية */
 .current-prayer {
   background-color: rgba(139, 94, 52, 0.15) !important;
   border-right: 4px solid var(--accent);
@@ -156,7 +154,20 @@ main{
 
 .tasbeeh-wrap{display:grid;gap:12px; width:100%; margin:0 auto}
 .tasbeeh-meta{display:grid;gap:8px;grid-template-columns:1fr auto}
-#tasbeehPhraseSelect{width:100%}
+
+/* تنسيق زر اختيار التسبيح ليكون بلون الخلفية وخط كبير */
+#tasbeehPhraseSelect {
+  width: 100%;
+  background-color: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--fg) !important;
+  font-size: 1.3rem !important;
+  font-weight: bold;
+  padding: 12px 8px !important;
+  border-radius: var(--radius);
+  outline: none;
+}
+
 .current-tasbeeh{padding:16px;border:var(--card-border);border-radius:var(--radius);background:var(--bg2);text-align:center;font-weight:800;font-size:1.6rem;line-height:1.8;color:var(--accent);box-shadow:var(--card-shadow);}
 .tasbeeh-kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .tasbeeh-counter{font-size:54px !important;line-height:1;font-weight:900;color:var(--accent);font-family:Arial,sans-serif}
@@ -167,7 +178,6 @@ main{
 .tasbeeh-secondary-row{display:flex;justify-content:center;margin-top:14px}
 .tasbeeh-reset-small{min-height:34px !important;padding:6px 16px !important;font-size:14px !important;border-radius:var(--radius) !important;min-width:84px}
 
-/* --- تصميم الشريط السفلي للتنقل --- */
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 0; right: 0;
@@ -176,13 +186,13 @@ main{
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 8px 6px calc(20px + env(safe-area-inset-bottom, 0px)); /* رفع الشريط قليلاً ليظهر الفوتر */
+  padding: 8px 6px calc(12px + env(safe-area-inset-bottom, 0px));
   z-index: 1000;
 }
 .bottom-nav button {
   background: var(--bg);
-  border: 1px solid var(--border); /* حدود للأزرار حسب طلبك */
-  border-radius: var(--radius); /* تتفاعل مع الثيم */
+  border: 1px solid var(--border); 
+  border-radius: var(--radius); 
   font-size: 1.6rem;
   padding: 8px 0;
   cursor: pointer;
@@ -191,27 +201,27 @@ main{
   margin: 0 4px;
   display: flex;
   justify-content: center;
-  filter: grayscale(100%) opacity(0.5); /* باهتة لغير النشط */
+  filter: grayscale(100%) opacity(0.5);
 }
 .bottom-nav button.active {
-  background: var(--accent); /* لون مميز للزر النشط */
+  background: var(--accent);
   border-color: var(--accent);
   filter: grayscale(0%) opacity(1);
   transform: translateY(-4px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* --- الفوتر المتناهي الصغر أسفل الشاشة تماماً --- */
+/* الفوتر الثابت فوق الأزرار مباشرة */
 .tiny-footer {
   position: fixed;
-  bottom: 2px;
+  bottom: calc(75px + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
-  opacity: 0.5;
-  z-index: 1001;
+  opacity: 0.7;
+  z-index: 999;
   pointer-events: none;
   font-family: Arial, sans-serif;
 }
@@ -235,11 +245,11 @@ main{
   #updateBar{bottom:90px;flex-direction:column;align-items:stretch}
 }
 @media (max-width:420px){
-  body{font-size:1rem}
+  body{font-size:1.05rem}
   .card{padding:12px}
   .brand img{width:28px;height:28px}
   .brand{font-size:1.1rem}
-  .toolbar button,.toolbar select,.btn,.row button,.row select,.row input{min-height:42px;font-size:1rem}
+  .toolbar button,.toolbar select,.btn,.row button,.row select,.row input{min-height:42px;font-size:1.05rem}
   .kpi .label,.small{font-size:14px}
   .kpi .value{font-size:18px}
   #nextCountdown{font-size:26px}
@@ -255,6 +265,6 @@ main{
   .tasbeeh-btn{width:100px;height:100px;font-size:24px}
   .btn.tiny,.mini-link{min-height:30px !important;padding:5px 9px !important;font-size:12px !important}
   .repeat-square{width:52px;min-width:52px;height:52px;font-size:16px !important}
-  .pills button { font-size: 0.8rem; padding: 4px 1px; min-height: 44px; }
+  .pills button { font-size: 0.9rem; padding: 4px 1px; min-height: 44px; }
   .bottom-nav button { font-size: 1.4rem; padding: 6px 0; }
 }
