@@ -1,4 +1,4 @@
-// Rafiq Muslim v0.4.0
+// Rafiq Muslim v0.4.1
 const API_BASE='https://api.aladhan.com/v1';
 const KAABA={lat:21.4225,lon:39.8262};
 const BDC_REVERSE='https://api-bdc.net/data/reverse-geocode-client';
@@ -18,8 +18,6 @@ function renderHijri(){
     d.setDate(d.getDate() + adj);
     const f=new Intl.DateTimeFormat('ar-SA-u-ca-islamic',{day:'numeric',month:'long',year:'numeric'}); 
     setText('hijri',f.format(d));
-    
-    // تذكيرات الصيام
     const parts = f.formatToParts(d);
     const dayPart = parts.find(p => p.type === 'day')?.value;
     const dayNum = parseInt(dayPart);
@@ -179,7 +177,7 @@ function updateGlobalProgress(list, keyPrefix) {
     const k=`dhikr:${keyPrefix}:${i}:${dayKey()}`;
     const rem = LS(k);
     if(typeof it.repeat === 'number') return rem === '0';
-    return true; // if no repeat target, count as done
+    return true; 
   }).length;
   bar.style.width = Math.round((completed / list.length) * 100) + '%';
 }
@@ -202,7 +200,6 @@ function renderPager(container,list,keyPrefix){
     const whenHtml=it.when?`<span class="when-chip">${it.when}</span>`:''; 
     const repeatHtml=repeatedOnce?'':`<button class="btn ${numeric?'':'secondary'} repeat-square ${numeric&&rem===0?'done':''} ${(!numeric||String(max).length>2)?'wide':''} do">${numeric?(rem===0?'تم':String(rem)):String(max)}</button>`; 
     
-    // فلترة التشكيل
     const displayText = showTashkeel ? it.text : it.text.replace(/[\u064B-\u065F\u0640]/g, '');
 
     card.innerHTML=`<p class="dhikr-text">${displayText}</p><div class="pager-meta"><span>المصدر: ${it.source||'—'}</span>${whenHtml}</div>${numeric&&!repeatedOnce?'<div class="progress"><div style="width:'+pct+'%"></div></div>':''}<div class="actions"><div class="left"><button class="btn secondary tiny copy">نسخ</button><a class="mini-link" href="${it.ref||'#'}" target="_blank" rel="noopener">مرجع</a></div>${repeatHtml}</div>`; 
