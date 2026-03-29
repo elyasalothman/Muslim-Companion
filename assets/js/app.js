@@ -1,4 +1,4 @@
-// Rafiq Muslim v0.2.4
+// Rafiq Muslim v0.2.5
 const API_BASE='https://api.aladhan.com/v1';
 const KAABA={lat:21.4225,lon:39.8262};
 const BDC_REVERSE='https://api-bdc.net/data/reverse-geocode-client';
@@ -46,14 +46,36 @@ function initScheme() {
   });
 }
 
-function showSection(id){qsa('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id)); qsa('.section').forEach(s=>s.classList.toggle('active',s.id===id));}
-function initNav(){qsa('.nav button').forEach(btn=>btn.addEventListener('click',async()=>{const id=btn.dataset.target; showSection(id); if(id==='adhkar'&&!loaded.adhkar){loaded.adhkar=true; await loadAdhkar();} if(id==='resources'&&!loaded.resources){loaded.resources=true; await loadResources();} if(id==='learning'&&!loaded.learning){loaded.learning=true; await loadLearning();} window.scrollTo({top:0,behavior:'smooth'});}));}
-function renderFooterVersion(){setText('footerVersion',`الإصدار 0.2.4`); setText('footerBrand','رفيق المسلم');}
-function initCityList(){const cities=[{label:'الرياض',city:'Riyadh',country:'SA'},{label:'مكة المكرمة',city:'Makkah',country:'SA'},{label:'المدينة المنورة',city:'Al Madinah al Munawwarah',country:'SA'},{label:'جدة',city:'Jeddah',country:'SA'},{label:'الدمام',city:'Dammam',country:'SA'},{label:'الطائف',city:'Taif',country:'SA'},{label:'أبها',city:'Abha',country:'SA'},{label:'تبوك',city:'Tabuk',country:'SA'}]; const sel=qs('#citySelect'); if(!sel) return; cities.forEach(c=>{const o=document.createElement('option'); o.value=JSON.stringify(c); o.textContent=c.label; sel.appendChild(o);}); const saved=LS('cityFallback'); if(saved) sel.value=saved; sel.addEventListener('change',()=>{LS('cityFallback',sel.value); updateCityKPIFromSelect();}); updateCityKPIFromSelect();}
+function showSection(id){
+  qsa('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id)); 
+  qsa('.section').forEach(s=>s.classList.toggle('active',s.id===id));
+}
+function initNav(){
+  qsa('.bottom-nav button').forEach(btn=>btn.addEventListener('click',async()=>{
+    const id=btn.dataset.target; showSection(id); 
+    if(id==='adhkar'&&!loaded.adhkar){loaded.adhkar=true; await loadAdhkar();} 
+    if(id==='resources'&&!loaded.resources){loaded.resources=true; await loadResources();} 
+    if(id==='learning'&&!loaded.learning){loaded.learning=true; await loadLearning();} 
+    window.scrollTo({top:0,behavior:'smooth'});
+  }));
+}
+function renderFooterVersion(){setText('footerVersion',`الإصدار 0.2.5`); setText('footerBrand','رفيق المسلم');}
+function initCityList(){
+  const cities=[{label:'الرياض',city:'Riyadh',country:'SA'},{label:'مكة المكرمة',city:'Makkah',country:'SA'},{label:'المدينة المنورة',city:'Al Madinah al Munawwarah',country:'SA'},{label:'جدة',city:'Jeddah',country:'SA'},{label:'الدمام',city:'Dammam',country:'SA'},{label:'الطائف',city:'Taif',country:'SA'},{label:'أبها',city:'Abha',country:'SA'},{label:'تبوك',city:'Tabuk',country:'SA'}]; 
+  const sel=qs('#citySelect'); if(!sel) return; 
+  cities.forEach(c=>{const o=document.createElement('option'); o.value=JSON.stringify(c); o.textContent=c.label; sel.appendChild(o);}); 
+  const saved=LS('cityFallback'); if(saved) sel.value=saved; 
+  // تحديث فوري للأوقات عند تغيير المدينة
+  sel.addEventListener('change',()=>{
+    LS('cityFallback',sel.value); 
+    updateCityKPIFromSelect();
+    loadPrayerTimes(true);
+  }); 
+  updateCityKPIFromSelect();
+}
 function getCityFallback(){const v=LS('cityFallback'); if(v) try{return JSON.parse(v)}catch(e){} return CFG.defaultCity;}
 function updateCityKPI(t){setText('cityDisplay',t||'—')}
 function updateCityKPIFromSelect(){const sel=qs('#citySelect'); if(sel&&sel.value) try{const o=JSON.parse(sel.value); updateCityKPI(o.label||o.city)}catch(e){} else {const c=getCityFallback(); updateCityKPI(c.label||c.city||'—')}}
-function setLocationMode(a){const wrap=qs('#cityControls'), chip=qs('#locChip'), btn=qs('#useLocation'); if(!wrap||!chip||!btn) return; if(a){wrap.style.display='none'; btn.style.display='none'; chip.style.display='inline-flex'; chip.textContent='الموقع مفعل ✓';} else {wrap.style.display='flex'; btn.style.display='inline-flex'; chip.style.display='none';}}
 async function reverseGeocodeCity(lat,lon){const key=`rg:${lat.toFixed(3)},${lon.toFixed(3)}`; const cached=LS(key); if(cached) try{return JSON.parse(cached)}catch(e){} const u=`${BDC_REVERSE}?latitude=${encodeURIComponent(lat)}&longitude=${encodeURIComponent(lon)}&localityLanguage=ar`; const r=await fetch(u); const j=await r.json(); const out={city:j.city||j.locality||j.principalSubdivision||null}; LS(key,JSON.stringify(out)); return out;}
 function renderNextPrayer(T,fajrTomorrowISO){
   const order=['Fajr','Dhuhr','Asr','Maghrib','Isha']; const now=new Date(); let name=null,time=null; 
@@ -65,7 +87,6 @@ function renderNextPrayer(T,fajrTomorrowISO){
     const diff=time-new Date(); 
     if(diff<=0){setText('nextCountdown','حان الوقت'); clearInterval(nextTimer); return;} 
     const h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000); 
-    // إخفاء الساعات إذا كانت صفر
     if(h > 0) {
       setText('nextCountdown',`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`);
     } else {
@@ -81,22 +102,19 @@ async function loadPrayerTimes(forceCity=false){
   try{
     let td,td2; 
     if(!forceCity&&'geolocation' in navigator){
-      setLocationMode(true); updateCityKPI('جاري تحديد المدينة…'); 
+      updateCityKPI('جاري التحديد…'); 
       const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:12000,maximumAge:600000})); 
       const lat=pos.coords.latitude, lon=pos.coords.longitude; 
-      
-      // تحديد دقة الموقع (عالية، متوسطة، سيئة)
       const acc = Math.round(pos.coords.accuracy||0);
       let accText = 'عالية';
       if(acc > 500) accText = 'سيئة';
       else if(acc > 50) accText = 'متوسطة';
       setText('ptMeta', `دقة الموقع: ${accText}`);
-      
       const rg=reverseGeocodeCity(lat,lon).catch(()=>null); 
       td=await fetchTimingsByCoords(today,lat,lon); td2=await fetchTimingsByCoords(tomorrow,lat,lon); 
       const city=await rg; updateCityKPI(city&&city.city?city.city:'موقعي'); setQiblaFromCoords(lat,lon);
     } else {
-      setLocationMode(false); updateCityKPI(c.label||c.city); 
+      updateCityKPI(c.label||c.city); 
       td=await fetchTimingsByCity(today,c.city,c.country); td2=await fetchTimingsByCity(tomorrow,c.city,c.country);
     } 
     const T=td.timings, TT=td2.timings; 
@@ -105,7 +123,7 @@ async function loadPrayerTimes(forceCity=false){
     const last=computeLastThird(T.Maghrib,TT.Fajr); setText('t_lastthird',`${formatTime12h(last.start)} – ${formatTime12h(last.end)}`); 
     renderNextPrayer(T,TT.Fajr);
   }catch(e){
-    console.warn(e); setLocationMode(false); setText('ptStatus','تعذّر تحديد الموقع/جلب المواقيت. جرّب اختيار مدينة.');
+    console.warn(e); setText('ptStatus','تعذّر التحديد التلقائي. اختر مدينة من القائمة.');
   }
 }
 function setupCompass(){const needle=qs('#needle'), acc=qs('#compassAccuracy'); if(!needle) return; let ema=null; function delta(a,b){return (b-a+540)%360-180} function render(q,h){needle.style.transform=`translate(-50%,-100%) rotate(${normalize360(q-h)}deg)`;} function onOri(ev){let heading=null; if(typeof ev.webkitCompassHeading==='number'&&ev.webkitCompassHeading>=0){heading=ev.webkitCompassHeading; if(typeof ev.webkitCompassAccuracy==='number') acc.textContent=`دقة البوصلة: ±${Math.round(ev.webkitCompassAccuracy)}°`;} else if(typeof ev.alpha==='number'){heading=360-ev.alpha; acc.textContent='دقة البوصلة: تقريبية';} if(heading==null) return; const q=parseFloat(LS('qiblaBearing')||'0')||0; if(ema==null) ema=heading; ema=normalize360(ema+delta(ema,heading)*0.18); render(q,ema);} qs('#enableCompass')?.addEventListener('click',async()=>{try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission(); if(p!=='granted') return;} window.addEventListener('deviceorientation',onOri,true); setText('compassStatus','تم تفعيل البوصلة');}catch(e){setText('compassStatus','تعذّر تفعيل البوصلة');}});}
@@ -119,5 +137,5 @@ async function loadResources(){const data=await (await fetch('./data/resources.j
 async function loadLearning(){const data=await (await fetch('./data/learning.json')).json(); const plan=qs('#learnPlan'), col=qs('#learnCollections'), rem=qs('#learnReminders'); if(plan){plan.innerHTML=''; (data.plan||[]).forEach(it=>{const d=document.createElement('div'); d.className='pager-card'; d.innerHTML=`<b>${it.title}</b><div class="small">${it.tip}</div>`; plan.appendChild(d);});} if(col){col.innerHTML=''; (data.collections||[]).forEach(it=>{const li=document.createElement('li'); li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>`; col.appendChild(li);});} if(rem){rem.innerHTML=''; (data.reminders||[]).forEach(t=>{const li=document.createElement('li'); li.textContent=t; rem.appendChild(li);});}}
 function showUpdateBar(reg){const bar=qs('#updateBar'); if(!bar) return; bar.style.display='flex'; qs('#updateNow')?.addEventListener('click',()=>{if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});},{once:true}); qs('#updateLater')?.addEventListener('click',()=>{bar.style.display='none';},{once:true});}
 async function registerSW(){if(!('serviceWorker' in navigator)) return; const reg=await navigator.serviceWorker.register('./service-worker.js',{scope:'./'}); try{await reg.update();}catch(e){} navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload(),{once:true}); if(reg.waiting) showUpdateBar(reg); reg.addEventListener('updatefound',()=>{const sw=reg.installing; if(!sw) return; sw.addEventListener('statechange',()=>{if(sw.state==='installed'&&navigator.serviceWorker.controller) showUpdateBar(reg);});});}
-async function init(){CFG=await (await fetch('./assets/js/config.json')).json(); initTheme(); initScheme(); initNav(); initCityList(); renderHijri(); renderFooterVersion(); loadStoredQibla(); setupCompass(); setupTasbeeh(); qs('#useLocation')?.addEventListener('click',()=>loadPrayerTimes(false)); qs('#useCity')?.addEventListener('click',()=>loadPrayerTimes(true)); await loadPrayerTimes(false); await registerSW();}
+async function init(){CFG=await (await fetch('./assets/js/config.json')).json(); initTheme(); initScheme(); initNav(); initCityList(); renderHijri(); renderFooterVersion(); loadStoredQibla(); setupCompass(); setupTasbeeh(); qs('#useLocation')?.addEventListener('click',()=>loadPrayerTimes(false)); await loadPrayerTimes(false); await registerSW();}
 window.addEventListener('load',init);
