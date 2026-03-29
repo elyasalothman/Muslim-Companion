@@ -1,116 +1,68 @@
-// Rafiq Muslim - Stable Core v0.7.0
-
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. نظام التنقل السلس ---
+    // 1. نظام التنقل بين الصفحات
     const navBtns = document.querySelectorAll('.bottom-nav button');
     const sections = document.querySelectorAll('.section');
     
     navBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // إزالة التفعيل من الجميع
             navBtns.forEach(b => b.classList.remove('active'));
             sections.forEach(s => s.classList.remove('active'));
-            // تفعيل الزر والقسم المختار
+            
             btn.classList.add('active');
-            const targetSection = document.getElementById(btn.dataset.target);
-            if(targetSection) targetSection.classList.add('active');
-            window.scrollTo(0, 0);
+            document.getElementById(btn.dataset.target).classList.add('active');
         });
     });
 
-    // --- 2. جلب أوقات الصلاة ---
-    async function fetchPrayerTimes() {
-        try {
-            const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Riyadh&country=SA&method=4');
-            const data = await res.json();
-            
+    // 2. جلب أوقات الصلاة والتاريخ
+    fetch('https://api.aladhan.com/v1/timingsByCity?city=Riyadh&country=SA&method=4')
+        .then(response => response.json())
+        .then(data => {
             if(data.code === 200) {
-                const t = data.data.timings;
+                const timings = data.data.timings;
+                document.getElementById('t_fajr').textContent = timings.Fajr;
+                document.getElementById('t_dhuhr').textContent = timings.Dhuhr;
+                document.getElementById('t_asr').textContent = timings.Asr;
+                document.getElementById('t_maghrib').textContent = timings.Maghrib;
+                document.getElementById('t_isha').textContent = timings.Isha;
                 
-                // تحويل الوقت لصيغة 12 ساعة (اختياري، حالياً 24 ساعة للثبات)
-                document.getElementById('t_fajr').textContent = t.Fajr;
-                document.getElementById('t_dhuhr').textContent = t.Dhuhr;
-                document.getElementById('t_asr').textContent = t.Asr;
-                document.getElementById('t_maghrib').textContent = t.Maghrib;
-                document.getElementById('t_isha').textContent = t.Isha;
-
-                // التاريخ الهجري
-                const hijriDate = data.data.date.hijri;
-                document.getElementById('hijriDate').textContent = `${hijriDate.day} ${hijriDate.month.ar} ${hijriDate.year}`;
+                const hijri = data.data.date.hijri;
+                document.getElementById('hijriDate').textContent = `${hijri.day} ${hijri.month.ar} ${hijri.year}`;
                 
-                // حفظ اتجاه القبلة للبوصلة
-                localStorage.setItem('qiblaDirection', data.data.meta.qibla);
+                localStorage.setItem('qibla', data.data.meta.qibla);
             }
-        } catch (error) {
-            console.error('خطأ في الاتصال بالانترنت:', error);
-            document.getElementById('hijriDate').textContent = "بدون اتصال";
-        }
-    }
-    fetchPrayerTimes();
+        })
+        .catch(error => {
+            document.getElementById('hijriDate').textContent = "يوجد مشكلة بالاتصال";
+        });
 
-    // --- 3. نظام المسبحة ---
-    let tasbeehCount = parseInt(localStorage.getItem('tasbeehCount') || '0', 10);
+    // 3. المسبحة
+    let tasbeehCount = localStorage.getItem('tasbeehScore') || 0;
     const countDisplay = document.getElementById('tasbeehCount');
-    
-    if(countDisplay) countDisplay.textContent = tasbeehCount;
+    countDisplay.textContent = tasbeehCount;
 
-    document.getElementById('tasbeehBtn')?.addEventListener('click', () => {
+    document.getElementById('tasbeehBtn').addEventListener('click', () => {
         tasbeehCount++;
         countDisplay.textContent = tasbeehCount;
-        localStorage.setItem('tasbeehCount', tasbeehCount);
-        
-        // اهتزاز خفيف إذا كان مدعوماً
-        if(navigator.vibrate) navigator.vibrate(15);
+        localStorage.setItem('tasbeehScore', tasbeehCount);
     });
 
-    document.getElementById('tasbeehReset')?.addEventListener('click', () => {
+    document.getElementById('tasbeehReset').addEventListener('click', () => {
         tasbeehCount = 0;
         countDisplay.textContent = tasbeehCount;
-        localStorage.setItem('tasbeehCount', '0');
+        localStorage.setItem('tasbeehScore', tasbeehCount);
     });
 
-    // --- 4. البوصلة الأساسية ---
-    const compassBtn = document.getElementById('enableCompass');
-    const needle = document.getElementById('needle');
-    const statusText = document.getElementById('compassStatus');
-
-    compassBtn?.addEventListener('click', async () => {
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            try {
-                const permissionState = await DeviceOrientationEvent.requestPermission();
-                if (permissionState === 'granted') {
-                    startCompass();
-                } else {
-                    statusText.textContent = "تم رفض صلاحية البوصلة.";
-                }
-            } catch (error) {
-                statusText.textContent = "خطأ في الصلاحيات.";
-            }
-        } else {
-            startCompass();
-        }
-    });
-
-    function startCompass() {
-        compassBtn.style.display = 'none';
-        statusText.textContent = "البوصلة تعمل.. حرك الجوال بشكل رقم 8 للمعايرة";
+    // 4. البوصلة
+    document.getElementById('enableCompass').addEventListener('click', () => {
+        const qibla = localStorage.getItem('qibla') || 136; // زاوية الرياض الافتراضية
+        document.getElementById('enableCompass').textContent = "البوصلة تعمل الآن";
         
-        window.addEventListener('deviceorientation', (event) => {
-            let heading = event.webkitCompassHeading || Math.abs(event.alpha - 360);
-            if(heading != null) {
-                const qibla = parseFloat(localStorage.getItem('qiblaDirection') || '136'); // 136 للرياض تقريباً
-                const angle = qibla - heading;
-                if(needle) needle.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+        window.addEventListener('deviceorientation', (e) => {
+            let heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
+            if(heading) {
+                document.getElementById('needle').style.transform = `translate(-50%, -100%) rotate(${qibla - heading}deg)`;
             }
         }, true);
-    }
-
-    // --- 5. زر الإصلاح الإجباري ---
-    document.getElementById('hardResetBtn')?.addEventListener('click', () => {
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.reload(true);
     });
-
 });
