@@ -1,4 +1,4 @@
-// Rafiq Muslim v0.2.6
+// Rafiq Muslim v0.2.9
 const API_BASE='https://api.aladhan.com/v1';
 const KAABA={lat:21.4225,lon:39.8262};
 const BDC_REVERSE='https://api-bdc.net/data/reverse-geocode-client';
@@ -15,8 +15,20 @@ function translatePrayer(k){return ({Fajr:'الفجر',Sunrise:'الشروق',Dh
 function computeDuha(s,d){return {start:new Date(isoToDate(s).getTime()+CFG.duha.startOffsetAfterSunriseMin*60000), end:new Date(isoToDate(d).getTime()-CFG.duha.endOffsetBeforeDhuhrMin*60000)}}
 function computeLastThird(m,f){const magh=isoToDate(m), fajr=isoToDate(f); let night=fajr-magh; if(night<=0) night+=86400000; const third=night/3; return {start:new Date(fajr.getTime()-third), end:fajr}}
 function bearing(lat1,lon1,lat2,lon2){const φ1=toRad(lat1),φ2=toRad(lat2),λ1=toRad(lon1),λ2=toRad(lon2); const y=Math.sin(λ2-λ1)*Math.cos(φ2),x=Math.cos(φ1)*Math.sin(φ2)-Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1); return normalize360(toDeg(Math.atan2(y,x)));}
-async function fetchTimingsByCoords(date,lat,lon){const ds=dateToApi(date); const u=`${API_BASE}/timings/${ds}?latitude=${lat}&longitude=${lon}&method=${CFG.calculation.method}&school=${CFG.calculation.school}&iso8601=true`; const r=await fetch(u); const j=await r.json(); if(j.code!==200) throw new Error('API'); return j.data;}
-async function fetchTimingsByCity(date,city,country){const ds=dateToApi(date); const u=`${API_BASE}/timingsByCity/${ds}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${CFG.calculation.method}&school=${CFG.calculation.school}&iso8601=true`; const r=await fetch(u); const j=await r.json(); if(j.code!==200) throw new Error('API'); return j.data;}
+
+// دالة جلب المواقيت مع إمكانية تحديد طريقة الحساب (Method)
+async function fetchTimingsByCoords(date,lat,lon, methodOverride){
+  const m = methodOverride || CFG.calculation.method;
+  const ds=dateToApi(date); 
+  const u=`${API_BASE}/timings/${ds}?latitude=${lat}&longitude=${lon}&method=${m}&school=${CFG.calculation.school}&iso8601=true`; 
+  const r=await fetch(u); const j=await r.json(); if(j.code!==200) throw new Error('API'); return j.data;
+}
+async function fetchTimingsByCity(date,city,country, methodOverride){
+  const m = methodOverride || CFG.calculation.method;
+  const ds=dateToApi(date); 
+  const u=`${API_BASE}/timingsByCity/${ds}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${m}&school=${CFG.calculation.school}&iso8601=true`; 
+  const r=await fetch(u); const j=await r.json(); if(j.code!==200) throw new Error('API'); return j.data;
+}
 
 function initTheme() {
   const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -78,90 +90,102 @@ async function reverseGeocodeCity(lat,lon){const key=`rg:${lat.toFixed(3)},${lon
 function renderNextPrayer(T,fajrTomorrowISO){
   const order=['Fajr','Dhuhr','Asr','Maghrib','Isha']; 
   const now=new Date(); let nextName=null,time=null, currName='Isha'; 
-  
   for(let i=0; i<order.length; i++){
-    const k = order[i];
-    const d=isoToDate(T[k]); 
-    if(d>now){
-      nextName=k; 
-      time=d; 
-      currName = i === 0 ? 'Isha' : order[i-1];
-      break;
-    }
+    const k = order[i]; const d=isoToDate(T[k]); 
+    if(d>now){nextName=k; time=d; currName = i === 0 ? 'Isha' : order[i-1]; break;}
   } 
   if(!nextName){nextName='Fajr'; time=isoToDate(fajrTomorrowISO); currName='Isha';} 
-  
   setText('nextPrayerName',translatePrayer(nextName)); setText('nextPrayerTime',formatTime12h(time)); 
-  
-  // تظليل الصلاة الحالية
   qsa('.table tbody tr').forEach(tr => tr.classList.remove('current-prayer'));
   const currRow = qs('#tr_' + currName);
   if(currRow) currRow.classList.add('current-prayer');
-
   if(nextTimer) clearInterval(nextTimer); 
   nextTimer=setInterval(()=>{
     const diff=time-new Date(); 
     if(diff<=0){setText('nextCountdown','حان الوقت'); clearInterval(nextTimer); return;} 
     const h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000); 
-    if(h > 0) {
-      setText('nextCountdown',`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`);
-    } else {
-      setText('nextCountdown',`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`);
-    }
+    if(h > 0) setText('nextCountdown',`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`);
+    else setText('nextCountdown',`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`);
   },1000);
 }
 function setQiblaFromCoords(lat,lon){const b=bearing(lat,lon,KAABA.lat,KAABA.lon); setText('qiblaDeg',`${b.toFixed(1)}°`); LS('qiblaBearing',String(b));}
 function loadStoredQibla(){const v=LS('qiblaBearing'); if(v) setText('qiblaDeg',`${parseFloat(v).toFixed(1)}°`)}
+
 async function loadPrayerTimes(forceCity=false){
   setText('ptStatus',''); setText('ptMeta',''); 
+  const controls = qs('#locationControls');
   const today=new Date(), tomorrow=new Date(Date.now()+86400000), c=getCityFallback(); 
+
+  const renderTimes = (T, TT, T_True) => {
+    ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(k=>{
+      const el = qs('#t_'+k.toLowerCase()+'_s');
+      if(el) el.textContent = formatTime12h(isoToDate(T[k]));
+    }); 
+    
+    // استخراج العشاء الحقيقي الفلكي من الطلب الثاني (رابطة العالم الإسلامي)
+    const trueIshaTime = isoToDate(T_True.Isha);
+    const elTrueIsha = qs('#t_isha_true_s');
+    if(elTrueIsha) elTrueIsha.textContent = formatTime12h(trueIshaTime);
+    
+    setText('t_fajr_e', formatTime12h(isoToDate(T.Sunrise)));
+    setText('t_dhuhr_e', formatTime12h(isoToDate(T.Asr)));
+    setText('t_asr_e', formatTime12h(isoToDate(T.Maghrib)));
+    
+    // خروج المغرب الآن مرتبط رياضياً بالميل الفلكي 100%
+    setText('t_maghrib_e', formatTime12h(trueIshaTime));
+    setText('t_isha_e', formatTime12h(isoToDate(T.Midnight)));
+
+    const duha=computeDuha(T.Sunrise,T.Dhuhr); 
+    setText('t_duha_s', formatTime12h(duha.start)); setText('t_duha_e', formatTime12h(duha.end)); 
+    const last=computeLastThird(T.Maghrib,TT.Fajr); 
+    setText('t_lastthird_s', formatTime12h(last.start)); setText('t_lastthird_e', formatTime12h(last.end)); 
+    renderNextPrayer(T,TT.Fajr);
+  };
+
   try{
-    let td,td2; 
-    if(!forceCity&&'geolocation' in navigator){
+    if(!forceCity && 'geolocation' in navigator){
       updateCityKPI('جاري التحديد…'); 
       const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:12000,maximumAge:600000})); 
       const lat=pos.coords.latitude, lon=pos.coords.longitude; 
       const acc = Math.round(pos.coords.accuracy||0);
       let accText = 'عالية';
-      if(acc > 500) accText = 'سيئة';
-      else if(acc > 50) accText = 'متوسطة';
+      
+      if(acc > 500) { accText = 'سيئة'; if(controls) controls.style.display = 'flex'; }
+      else { if(acc > 50) accText = 'متوسطة'; if(controls) controls.style.display = 'none'; }
+      
       setText('ptMeta', `دقة الموقع: ${accText}`);
       const rg=reverseGeocodeCity(lat,lon).catch(()=>null); 
-      td=await fetchTimingsByCoords(today,lat,lon); td2=await fetchTimingsByCoords(tomorrow,lat,lon); 
-      const city=await rg; updateCityKPI(city&&city.city?city.city:'موقعي'); setQiblaFromCoords(lat,lon);
-    } else {
-      updateCityKPI(c.label||c.city); 
-      td=await fetchTimingsByCity(today,c.city,c.country); td2=await fetchTimingsByCity(tomorrow,c.city,c.country);
-    } 
-    const T=td.timings, TT=td2.timings; 
-    
-    // أوقات الدخول
-    ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'].forEach(k=>{
-      const el = qs('#t_'+k.toLowerCase()+'_s');
-      if(el) el.textContent = formatTime12h(isoToDate(T[k]));
-    }); 
-    
-    // أوقات الخروج
-    setText('t_fajr_e', formatTime12h(isoToDate(T.Sunrise)));
-    setText('t_sunrise_e', '—');
-    setText('t_dhuhr_e', formatTime12h(isoToDate(T.Asr)));
-    setText('t_asr_e', formatTime12h(isoToDate(T.Maghrib)));
-    setText('t_maghrib_e', formatTime12h(isoToDate(T.Isha)));
-    setText('t_isha_e', formatTime12h(isoToDate(T.Midnight)));
+      
+      // جلب المواقيت الرسمية (أم القرى)
+      const td=await fetchTimingsByCoords(today,lat,lon); 
+      const td2=await fetchTimingsByCoords(tomorrow,lat,lon); 
+      // جلب المواقيت الفلكية (رابطة العالم الإسلامي - Method 3) لمعرفة الشفق الأحمر بالضبط
+      const tdTrue=await fetchTimingsByCoords(today,lat,lon, 3); 
 
-    const duha=computeDuha(T.Sunrise,T.Dhuhr); 
-    setText('t_duha_s', formatTime12h(duha.start)); 
-    setText('t_duha_e', formatTime12h(duha.end)); 
-    
-    const last=computeLastThird(T.Maghrib,TT.Fajr); 
-    setText('t_lastthird_s', formatTime12h(last.start)); 
-    setText('t_lastthird_e', formatTime12h(last.end)); 
-    
-    renderNextPrayer(T,TT.Fajr);
+      const city=await rg; updateCityKPI(city&&city.city?city.city:'موقعي'); setQiblaFromCoords(lat,lon);
+      renderTimes(td.timings, td2.timings, tdTrue.timings);
+    } else {
+      if(controls) controls.style.display = 'flex';
+      updateCityKPI(c.label||c.city); 
+      const td=await fetchTimingsByCity(today,c.city,c.country); 
+      const td2=await fetchTimingsByCity(tomorrow,c.city,c.country);
+      const tdTrue=await fetchTimingsByCity(today,c.city,c.country, 3);
+      renderTimes(td.timings, td2.timings, tdTrue.timings);
+    } 
   }catch(e){
-    console.warn(e); setText('ptStatus','تعذّر التحديد التلقائي. اختر مدينة من القائمة.');
+    console.warn(e); 
+    if(controls) controls.style.display = 'flex';
+    setText('ptStatus','لم يتم تفعيل الموقع، يمكنك اختيار المدينة يدوياً.');
+    updateCityKPI(c.label||c.city);
+    try {
+        const td = await fetchTimingsByCity(today,c.city,c.country);
+        const td2 = await fetchTimingsByCity(tomorrow,c.city,c.country);
+        const tdTrue = await fetchTimingsByCity(today,c.city,c.country, 3);
+        renderTimes(td.timings, td2.timings, tdTrue.timings);
+    } catch(ex){}
   }
 }
+
 function setupCompass(){const needle=qs('#needle'), acc=qs('#compassAccuracy'); if(!needle) return; let ema=null; function delta(a,b){return (b-a+540)%360-180} function render(q,h){needle.style.transform=`translate(-50%,-100%) rotate(${normalize360(q-h)}deg)`;} function onOri(ev){let heading=null; if(typeof ev.webkitCompassHeading==='number'&&ev.webkitCompassHeading>=0){heading=ev.webkitCompassHeading; if(typeof ev.webkitCompassAccuracy==='number') acc.textContent=`دقة البوصلة: ±${Math.round(ev.webkitCompassAccuracy)}°`;} else if(typeof ev.alpha==='number'){heading=360-ev.alpha; acc.textContent='دقة البوصلة: تقريبية';} if(heading==null) return; const q=parseFloat(LS('qiblaBearing')||'0')||0; if(ema==null) ema=heading; ema=normalize360(ema+delta(ema,heading)*0.18); render(q,ema);} qs('#enableCompass')?.addEventListener('click',async()=>{try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function'){const p=await DeviceOrientationEvent.requestPermission(); if(p!=='granted') return;} window.addEventListener('deviceorientation',onOri,true); setText('compassStatus','تم تفعيل البوصلة');}catch(e){setText('compassStatus','تعذّر تفعيل البوصلة');}});}
 function haptic(ms=10){try{if(navigator.vibrate) navigator.vibrate(ms);}catch(e){}}
 function setupTasbeeh(){const select=qs('#tasbeehPhraseSelect'), current=qs('#currentTasbeeh'), countEl=qs('#tasbeehCount'), targetEl=qs('#tasbeehTarget'), btn=qs('#tasbeehBtn'), resetBtn=qs('#tasbeehReset'), nextBtn=qs('#tasbeehNext'), hint=qs('#tasbeehHint'); if(!select||!current||!countEl||!targetEl||!btn||!resetBtn||!nextBtn) return; select.innerHTML=''; TASBEEH_PHRASES.forEach((p,idx)=>{const o=document.createElement('option'); o.value=String(idx); o.textContent=`${p.name} — ${p.target}`; select.appendChild(o);}); let phraseIndex=parseInt(LS('tasbeehPhraseIndex')||'0',10); if(Number.isNaN(phraseIndex)||phraseIndex<0||phraseIndex>=TASBEEH_PHRASES.length) phraseIndex=0; let count=parseInt(LS('tasbeehCount')||'0',10); if(Number.isNaN(count)||count<0) count=0; function render(){const p=TASBEEH_PHRASES[phraseIndex]; select.value=String(phraseIndex); current.textContent=p.name; countEl.textContent=String(count); targetEl.textContent=`الهدف: ${p.target}`; if(hint) hint.textContent=count>=p.target?'ما شاء الله ✓ اكتمل الهدف — يمكنك الانتقال للتسبيح التالي':'اهتزاز خفيف مع كل ضغطة، واهتزاز أوضح عند إكمال الهدف';} function save(){LS('tasbeehPhraseIndex',String(phraseIndex)); LS('tasbeehCount',String(count));} select.addEventListener('change',()=>{phraseIndex=parseInt(select.value,10)||0; count=0; save(); render(); haptic(10);}); const increment=()=>{const p=TASBEEH_PHRASES[phraseIndex]; count+=1; save(); render(); if(count===p.target) haptic([28,35,28]); else haptic(9);}; btn.addEventListener('click',increment); btn.addEventListener('touchstart',()=>haptic(7),{passive:true}); resetBtn.addEventListener('click',()=>{count=0; save(); render(); haptic(15);}); nextBtn.addEventListener('click',()=>{phraseIndex=(phraseIndex+1)%TASBEEH_PHRASES.length; count=0; save(); render(); haptic([15,18,15]);}); render();}
