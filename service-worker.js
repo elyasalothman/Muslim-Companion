@@ -1,10 +1,11 @@
-const CACHE_NAME = 'rafiq-cache-v0.5.1';
+const CACHE_NAME = 'rafiq-cache-v0.6.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './assets/css/styles.css?v=0.5.1',
-  './assets/js/app.js?v=0.5.1',
-  './assets/js/config.json'
+  './assets/css/styles.css?v=0.6.0',
+  './assets/js/app.js?v=0.6.0',
+  './assets/js/config.json',
+  './data/benefits.json'
 ];
 
 self.addEventListener('install', (event) => {
