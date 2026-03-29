@@ -2,33 +2,30 @@
 
 /* --- الثيمات الراقية والمتقنة --- */
 
-/* الكلاسيكي (البني الذهبي مع الزخارف) */
 :root, [data-scheme='brown'] {
   --bg: #2b221a; 
   --bg2: #3a2e24; 
   --card: #3a2e24; 
   --fg: #fdf5e6; 
   --muted: #d4c4b7; 
-  --accent: #d4af37; /* ذهبي فخم */
+  --accent: #d4af37; 
   --accent2: #b8860b; 
   --danger: #e63946; 
   --border: rgba(212, 175, 55, 0.35);
   --radius: 14px; 
   --card-border: 1px solid var(--border); 
   --card-shadow: 0 8px 24px rgba(0,0,0,0.3); 
-  /* زخرفة هندسية احترافية مدمجة */
   --pattern-bg: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0l2 10 10 2-10 2-2 10-2-10-10-2 10-2z' fill='%23d4af37' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
 
-/* الملون (الزجاجي الفخم - Glassmorphism) */
 [data-scheme='colorful'] {
   --bg: #0f172a; 
   --bg2: rgba(30, 41, 59, 0.7); 
   --card: rgba(30, 41, 59, 0.7);
   --fg: #f8fafc; 
   --muted: #cbd5e1; 
-  --accent: #00e5ff; /* توهج سماوي */
-  --accent2: #ff4081; /* زهري متوهج */
+  --accent: #00e5ff; 
+  --accent2: #ff4081; 
   --danger: #ff5252; 
   --border: rgba(255, 255, 255, 0.15);
   --radius: 20px; 
@@ -38,7 +35,6 @@
                 radial-gradient(circle at 90% 80%, rgba(255, 64, 129, 0.08), transparent 40%);
 }
 
-/* الأسود (OLED - مسطح وواضح) */
 [data-scheme='black'] {
   --bg: #000000; --bg2: #141414; --card: #141414;
   --fg: #ffffff; --muted: #aaaaaa; --accent: #ffffff; --accent2: #666666; 
@@ -46,7 +42,6 @@
   --radius: 8px; --card-border: 1px solid var(--border); --card-shadow: none; --pattern-bg: none;
 }
 
-/* الرصاصي (الزجاجي الداكن) */
 [data-scheme='gray'] {
   --bg: #1a1c23; --bg2: #272a33; --card: #272a33;
   --fg: #f1f3f5; --muted: #aab0b6; --accent: #8ab4f8; --accent2: #5f6368; 
@@ -54,7 +49,6 @@
   --radius: 16px; --card-border: 1px solid var(--border); --card-shadow: 0 8px 24px rgba(0,0,0,0.3); --pattern-bg: none;
 }
 
-/* الأبيض (الورقي الساطع) */
 [data-scheme='white'] {
   --bg: #f4f6f8; --bg2: #ffffff; --card: #ffffff;
   --fg: #1c1e21; --muted: #606770; --accent: #1877f2; --accent2: #a0aab5; 
@@ -62,12 +56,11 @@
   --radius: 14px; --card-border: 1px solid var(--border); --card-shadow: 0 4px 16px rgba(0,0,0,0.06); --pattern-bg: none;
 }
 
-/* --- الإعدادات الأساسية الشاملة --- */
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0;padding:0;overflow-x:hidden}
 body{
   font-family: 'Amiri', serif;
-  font-size: 1.5rem; /* تكبير الخط الافتراضي بشكل كبير */
+  font-size: 1.5rem; 
   text-rendering:optimizeLegibility;
   background:var(--bg);
   color:var(--fg);
@@ -76,7 +69,6 @@ body{
   transition: font-size 0.3s ease, background 0.4s ease, color 0.4s ease;
 }
 
-/* دمج الزخارف في الخلفية بشكل نظيف */
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none; z-index:-2;
   background: var(--pattern-bg, none);
@@ -85,15 +77,18 @@ body::before{
 a{color:inherit; text-decoration:none;}
 img,svg,canvas{max-width:100%;height:auto}
 
-/* --- الهيدر والأزرار العلوية --- */
-header {
+header, .bottom-nav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+header{
   position:fixed !important;top:0;left:0;right:0;z-index:100;
   background:var(--bg2);
   border-bottom:1px solid var(--border);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  transition: background 0.3s ease, border-color 0.3s ease;
   position: relative;
 }
-/* دمج الزخارف في الهيدر */
 header::before {
   content:''; position:absolute; inset:0; pointer-events:none; z-index:-1;
   background: var(--pattern-bg, none); opacity: 0.6;
@@ -119,7 +114,6 @@ header::before {
 }
 .tool-btn:hover { background: var(--accent); color: var(--bg); transform: translateY(-2px); border-color: var(--accent); }
 
-/* --- البطاقات (Cards) والزخارف بداخلها --- */
 main{
   width:100%; max-width:100%; padding:10px 8px; display:grid; gap:16px; margin:0;
 }
@@ -128,7 +122,10 @@ main{
   box-shadow:var(--card-shadow); padding:20px; position:relative; overflow:hidden;
   transition: background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
 }
-/* وضع الزخرفة داخل البطاقة بوضوح وجمال */
+[data-scheme='colorful'] .card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 .card::before {
   content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
   background: var(--pattern-bg, none); opacity: 0.8;
@@ -145,7 +142,6 @@ main{
 .kpi .value{font-size:2rem;font-weight:900;color:var(--accent)}
 .kpi .value.secondary{color:var(--accent2)}
 
-/* تأثير النبض للعد التنازلي */
 @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1); } }
 .pulse-text { animation: pulse 2s infinite ease-in-out; }
 #nextCountdown{font-size:4rem;font-weight:900;color:var(--accent2);margin-top:8px}
@@ -154,7 +150,6 @@ main{
 .section.active{display:block; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;}
 @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- الإدخالات والأزرار --- */
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .row button,.row select,.row input {
   border:1px solid var(--border);background:var(--bg);color:var(--fg);
@@ -163,13 +158,6 @@ main{
 }
 .row button:hover, .row select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,175,55,0.2); }
 
-.btn{background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius);padding:14px 20px;font-weight:900;font-family:'Amiri',serif;cursor:pointer; font-size: 1.3rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
-.btn:hover{transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.3);}
-.btn.secondary{background:var(--bg);color:var(--fg);border:1px solid var(--border); box-shadow: none;}
-.btn.secondary:hover{border-color: var(--accent); color: var(--accent);}
-.btn.danger{background:var(--danger);color:#fff;}
-
-/* --- جدول المواقيت الموحد والواضح جداً --- */
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .table{width:100%;border-collapse:collapse;border: 1px solid var(--border); margin-top:12px; border-radius: var(--radius); overflow: hidden; background: var(--bg);}
 .table th,.table td{padding:18px 8px; border-bottom:1px solid var(--border); font-size: 1.5rem; font-weight: bold;}
@@ -182,7 +170,12 @@ main{
 }
 [data-scheme='colorful'] .current-prayer { background-color: rgba(0, 229, 255, 0.15) !important; }
 
-/* --- الأذكار --- */
+.btn{background:var(--accent);color:var(--bg);border:none;border-radius:var(--radius);padding:14px 20px;font-weight:900;font-family:'Amiri',serif;cursor:pointer; font-size: 1.3rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
+.btn:hover{transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.3);}
+.btn.secondary{background:var(--bg);color:var(--fg);border:1px solid var(--border); box-shadow: none;}
+.btn.secondary:hover{border-color: var(--accent); color: var(--accent);}
+.btn.danger{background:var(--danger);color:#fff;}
+
 .pills {display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 0 20px;}
 .pills button {
   border: 1px solid var(--border); background: var(--bg); color: var(--fg);
@@ -211,7 +204,6 @@ main{
 .repeat-square.done{background:var(--accent2);color:#fff;border-color:var(--accent2)}
 .when-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:var(--radius);border:1px dashed var(--accent);font-size:1.2rem;color:var(--accent)}
 
-/* --- البوصلة والتسبيح --- */
 .compass{position:relative;width:260px;height:260px;margin:20px auto}
 .compass .dial{position:absolute;inset:0;border-radius:50%;border:6px solid var(--accent);background:var(--bg) url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23d4af37' stroke-width='1' stroke-opacity='0.3'/%3E%3C/svg%3E") center center no-repeat; background-size: cover; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
 .compass .needle{position:absolute;left:50%;top:50%;width:8px;height:120px;background:var(--danger);transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(0deg);border-radius:6px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); transition: transform 0.1s linear;}
@@ -230,7 +222,7 @@ main{
 .tasbeeh-counter{font-size:4.5rem !important;line-height:1;font-weight:900;color:var(--accent);font-family:Arial,sans-serif}
 .tasbeeh-target{font-size:1.8rem;font-weight:800;color:var(--accent2)}
 .tasbeeh-main-btn-wrap{margin-top:16px;display:flex;justify-content:center}
-/* زر التسبيح مزخرف ومميز */
+
 .tasbeeh-btn{
   width:180px;height:180px;border-radius:50%;font-size:2.5rem;font-weight:900;
   background: radial-gradient(circle at 30% 30%, var(--accent), var(--accent2));
@@ -246,14 +238,11 @@ main{
 .custom-list a { color: var(--accent); text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 4px; }
 .custom-list a:hover { color: var(--accent2); }
 
-/* --- الشريط السفلي --- */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--border);
   display: flex; justify-content: space-around; align-items: center;
   padding: 12px 8px calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1000;
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
 }
-/* دمج الزخارف في الشريط السفلي */
 .bottom-nav::before {
   content:''; position:absolute; inset:0; pointer-events:none; z-index:-1;
   background: var(--pattern-bg, none); opacity: 0.6;
