@@ -4,113 +4,66 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <meta name="theme-color" content="#1a1410"/>
-  <link rel="manifest" href="./manifest.webmanifest"/>
-  <link rel="icon" href="./assets/img/icon-192.png"/>
-  <link rel="stylesheet" href="./assets/css/styles.css?v=0.6.3"/>
+  <link rel="stylesheet" href="./assets/css/styles.css?v=0.6.4"/>
   <title>رفيق المسلم</title>
 </head>
 <body>
 <header>
   <div class="header-wrap">
     <div class="brand">
-      <img src="./assets/img/logo.svg" alt="" id="appLogo"/>
       <span>رفيق المسلم</span>
+      <img src="./assets/img/logo.svg" alt="" id="appLogo" style="width:30px; margin-right:8px;"/>
     </div>
   </div>
 </header>
 
-<main>
-  <div class="card">
+<main id="appBody" style="display:none;"> <div class="card">
     <div class="grid">
       <div class="kpi">
         <div class="label">التاريخ الهجري</div>
         <div class="value secondary" id="hijri">—</div>
-        <div id="fastingReminder" class="small-hint" style="color: var(--accent); font-weight: bold; margin-top: 6px;"></div>
       </div>
-      <div class="kpi"><div class="label">الصلاة القادمة</div><div class="value"><span id="nextPrayerName">—</span> <span>(</span><span id="nextPrayerTime">—</span><span>)</span></div><div id="nextCountdown" style="direction: ltr;" class="pulse-text">—</div></div>
-      <div class="kpi"><div class="label">المدينة</div><div class="value" id="cityDisplay">—</div><div class="small" id="ptMeta"></div></div>
+      <div class="kpi">
+        <div class="label">الصلاة القادمة</div>
+        <div class="value"><span id="nextPrayerName">—</span> (<span id="nextPrayerTime">—</span>)</div>
+        <div id="nextCountdown" style="direction: ltr;">—</div>
+      </div>
     </div>
   </div>
 
   <div class="card">
     <section id="times" class="section active">
-      <div class="row" id="locationControls" style="display: flex; flex-wrap: nowrap; gap: 8px;">
-        <button class="btn" id="useLocation" title="تحديد موقعي التلقائي">📍</button>
-        <select id="citySelect" style="flex: 1;"><option value="">— اختر مدينة يدوياً —</option></select>
-      </div>
-      <div class="small" id="ptStatus" style="margin-top: 8px; text-align: center;"></div>
       <div class="table-wrap">
         <table class="table">
-          <thead>
-            <tr><th style="text-align: right;">الصلاة</th><th style="text-align: center;">دخول</th><th style="text-align: center;">خروج</th></tr>
-          </thead>
-          <tbody>
-            <tr id="tr_Fajr"><th>الفجر</th><td id="t_fajr_s" style="text-align: center;">—</td><td id="t_fajr_e" style="text-align: center;">—</td></tr>
-            <tr class="minor" id="tr_Duha"><th>الضحى</th><td id="t_duha_s" style="text-align: center;">—</td><td id="t_duha_e" style="text-align: center;">—</td></tr>
-            <tr id="tr_Dhuhr"><th>الظهر</th><td id="t_dhuhr_s" style="text-align: center;">—</td><td id="t_dhuhr_e" style="text-align: center;">—</td></tr>
-            <tr id="tr_Asr"><th>العصر</th><td id="t_asr_s" style="text-align: center;">—</td><td id="t_asr_e" style="text-align: center;">—</td></tr>
-            <tr id="tr_Maghrib"><th>المغرب</th><td id="t_maghrib_s" style="text-align: center;">—</td><td id="t_maghrib_e" style="text-align: center;">—</td></tr>
-            <tr id="tr_Isha"><th>العشاء</th><td style="text-align: center;"><span id="t_isha_s">—</span><span style="margin: 0 4px;">|</span>فعلي: <span id="t_isha_true_s">—</span></td><td id="t_isha_e" style="text-align: center;">—</td></tr>
-            <tr class="minor" id="tr_Lastthird"><th>الثلث الأخير</th><td id="t_lastthird_s" style="text-align: center;">—</td><td id="t_lastthird_e" style="text-align: center;">—</td></tr>
+          <tbody id="prayerTableBody">
+            <tr><td>جاري تحميل الأوقات...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
-
+    
     <section id="qibla" class="section">
-      <p style="text-align: center; font-weight: 700; font-size: 1.4rem;">زاوية القبلة: <span id="qiblaDeg" style="color: var(--accent);">—</span></p>
       <div class="compass"><div class="dial"></div><div id="needle" class="needle"></div></div>
-      <div class="row" style="justify-content: center; margin-top: 24px;"><button class="btn" id="enableCompass">تفعيل البوصلة الذكية 🧭</button></div>
-      <div id="compassAccuracyBox" class="accuracy-box">— جاري تهيئة الحساس —</div>
-      <div class="small" id="compassStatus" style="text-align: center; margin-top: 10px;"></div>
-    </section>
-
-    <section id="adhkar" class="section">
-      <div id="adhkarPills" class="pills"></div>
-      <div class="progress" style="margin-bottom: 24px;"><div id="globalAdhkarProgress"></div></div>
-      <div id="adhkarContainer"></div>
-    </section>
-
-    <section id="tasbeeh" class="section">
-      <div class="tasbeeh-wrap">
-        <div class="tasbeeh-meta"><select id="tasbeehPhraseSelect"></select><button class="btn secondary" id="tasbeehNext">التالي</button></div>
-        <div class="current-tasbeeh" id="currentTasbeeh">سُبْحَانَ اللَّهِ</div>
-        <div class="tasbeeh-kpi">
-          <div class="card inner-card"><div class="kpi"><div class="label">العدّاد</div><div class="tasbeeh-counter" id="tasbeehCount">0</div></div></div>
-          <div class="card inner-card"><div class="kpi"><div class="label">الهدف</div><div class="tasbeeh-target" id="tasbeehTarget">الهدف: 33</div></div></div>
-        </div>
-        <div class="tasbeeh-main-btn-wrap"><button class="tasbeeh-btn" id="tasbeehBtn">سَبِّح</button></div>
-        <div class="tasbeeh-secondary-row"><button class="btn danger" id="tasbeehReset">تصفير</button></div>
-      </div>
+      <button class="btn" id="enableCompass" style="width:100%; margin-top:20px;">تفعيل البوصلة 🧭</button>
     </section>
 
     <section id="settings" class="section">
-      <h3 class="section-title">إعدادات التطبيق</h3>
-      <div class="pager-card" style="margin-bottom: 18px;">
-        <div class="label-official">المظهر والألوان:</div>
-        <div class="color-grid">
-          <button class="color-dot" data-val="white" style="background:#f8f9fa"></button>
-          <button class="color-dot" data-val="black" style="background:#141414"></button>
-          <button class="color-dot" data-val="brown" style="background:#d4af37"></button>
-          <button class="color-dot" data-val="colorful" style="background:linear-gradient(45deg,#06b6d4,#8b5cf6)"></button>
-        </div>
-      </div>
-      <div class="pager-card" style="margin-bottom: 28px;">
-        <div class="label-official">تحديثات النظام:</div>
-        <button class="btn secondary" style="width:100%" onclick="location.reload(true)">تحديث إجباري للصفحة 🔄</button>
-      </div>
-      <div class="version-tag">الإصدار 0.6.3</div>
+      <div class="version-tag">الإصدار 0.6.4</div>
+      <button class="btn secondary" style="width:100%" onclick="localStorage.clear(); location.reload();">إعادة ضبط المصنع 🛠️</button>
     </section>
   </div>
 </main>
 
+<div id="loadingScreen" style="text-align:center; padding-top:100px; font-weight:bold;">
+  جاري تشغيل رفيق المسلم...
+</div>
+
 <nav class="bottom-nav">
   <button class="active" data-target="times">🕌</button>
   <button data-target="qibla">🧭</button>
-  <button data-target="adhkar">🤲</button>
-  <button data-target="tasbeeh">📿</button>
   <button data-target="settings">⚙️</button>
 </nav>
-<script src="./assets/js/app.js?v=0.6.3" type="module"></script>
+
+<script src="./assets/js/app.js?v=0.6.4" type="module"></script>
 </body>
 </html>
