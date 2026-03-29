@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1a1410"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <link rel="icon" href="./assets/img/icon-192.png"/>
-  <link rel="stylesheet" href="./assets/css/styles.css?v=0.3.0"/>
+  <link rel="stylesheet" href="./assets/css/styles.css?v=0.3.1"/>
   <title>رفيق المسلم</title>
 </head>
 <body>
@@ -59,7 +59,8 @@
             <tr id="tr_Maghrib"><th>المغرب</th><td id="t_maghrib_s" style="text-align: center; font-weight: bold;">—</td><td id="t_maghrib_e" class="small" style="text-align: center; color: var(--accent2); font-weight: bold;">—</td></tr>
             <tr id="tr_Isha"><th>العشاء</th>
               <td style="text-align: center; font-weight: bold;">
-                <span id="t_isha_s">—</span> <span style="font-weight: normal; margin: 0 4px; color: var(--muted);">|</span> فعلي: <span id="t_isha_true_s">—</span>
+                <div id="t_isha_s">—</div>
+                <div class="small" style="font-weight: normal; margin-top: 4px; color: var(--muted); font-size: 0.85rem;">فعلي: <span id="t_isha_true_s">—</span></div>
               </td>
               <td id="t_isha_e" class="small" style="text-align: center;">—</td>
             </tr>
@@ -121,6 +122,10 @@
   <div class="row" style="margin:0"><button class="btn" id="updateNow">تحديث الآن</button><button class="btn secondary" id="updateLater">لاحقًا</button></div>
 </div>
 
+<div class="tiny-footer">
+  رفيق المسلم - الإصدار 0.3.1
+</div>
+
 <nav class="bottom-nav">
   <button class="active" data-target="times" title="أوقات الصلاة">🕌</button>
   <button data-target="qibla" title="القبلة">🧭</button>
@@ -130,10 +135,6 @@
   <button data-target="resources" title="روابط">🔗</button>
 </nav>
 
-<div class="tiny-footer">
-  رفيق المسلم - الإصدار 0.3.0
-</div>
-
-<script src="./assets/js/app.js?v=0.3.0" type="module"></script>
+<script src="./assets/js/app.js?v=0.3.1" type="module"></script>
 </body>
 </html>
