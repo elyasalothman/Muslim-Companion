@@ -1,16 +1,34 @@
-// Rafiq Muslim v0.4.1
+// Rafiq Muslim v0.5.0 - Bulletproof Version
 const API_BASE='https://api.aladhan.com/v1';
 const KAABA={lat:21.4225,lon:39.8262};
 const BDC_REVERSE='https://api-bdc.net/data/reverse-geocode-client';
-const qs=(s,r=document)=>r.querySelector(s), qsa=(s,r=document)=>Array.from(r.querySelectorAll(s)), LS=(k,v)=>v===undefined?localStorage.getItem(k):localStorage.setItem(k,v);
-let CFG=null,nextTimer=null; let loaded={adhkar:false,resources:false,learning:false};
-let rawAdhkarData=null; let showTashkeel=LS('tashkeel')!=='false'; let currentFontSize=parseFloat(LS('fontSize'))||1.4;
+const qs=(s,r=document)=>r.querySelector(s), qsa=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const LS = (k,v) => { try { if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); } catch(e) { return null; } };
+
+let CFG=null, nextTimer=null; let loaded={adhkar:false,resources:false,learning:false};
+let rawAdhkarData=null; let showTashkeel=LS('tashkeel')!=='false'; 
+let currentFontSize = parseFloat(LS('fontSize')); if(isNaN(currentFontSize)) currentFontSize = 1.5;
+
 const TASBEEH_PHRASES=[{"name": "سُبْحَانَ اللَّهِ", "target": 33}, {"name": "الْحَمْدُ لِلَّهِ", "target": 33}, {"name": "اللَّهُ أَكْبَرُ", "target": 34}, {"name": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ", "target": 100}, {"name": "لَا إِلَهَ إِلَّا اللَّهُ", "target": 100}, {"name": "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ", "target": 100}, {"name": "أَسْتَغْفِرُ اللَّهَ", "target": 100}];
+
 function setText(id,t){const e=document.getElementById(id); if(e) e.textContent=t;}
 function isoToDate(i){return new Date(i)}
 function dateToApi(d){return String(d.getDate()).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+d.getFullYear()}
 function toRad(x){return x*Math.PI/180} function toDeg(x){return x*180/Math.PI} function normalize360(x){x%=360; if(x<0)x+=360; return x}
 function formatTime12h(d){try{return new Intl.DateTimeFormat('ar',{hour:'numeric',minute:'2-digit',hour12:true}).format(d)}catch(e){let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');const suf=h>=12?'م':'ص';h=h%12||12;return `${h}:${m} ${suf}`;}}
+
+// دالة جلب آمنة تماماً
+async function fetchJSON(url, defaultData) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP error ' + res.status);
+        return await res.json();
+    } catch(e) {
+        console.warn('Fallback applied for:', url);
+        return defaultData;
+    }
+}
+
 function renderHijri(){
   try{
     const d = new Date();
@@ -38,13 +56,13 @@ async function fetchTimingsByCoords(date,lat,lon, methodOverride){const m = meth
 async function fetchTimingsByCity(date,city,country, methodOverride){const m = methodOverride || CFG.calculation.method; const ds=dateToApi(date); const u=`${API_BASE}/timingsByCity/${ds}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${m}&school=${CFG.calculation.school}&iso8601=true`; const r=await fetch(u); const j=await r.json(); if(j.code!==200) throw new Error('API'); return j.data;}
 
 function initScheme() {
-  const savedScheme = localStorage.getItem('scheme') || 'brown';
+  const savedScheme = LS('scheme') || 'brown';
   document.documentElement.setAttribute('data-scheme', savedScheme);
   document.querySelectorAll('.color-dot').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const val = e.target.getAttribute('data-val');
       document.documentElement.setAttribute('data-scheme', val);
-      localStorage.setItem('scheme', val);
+      LS('scheme', val);
     });
   });
 }
@@ -55,34 +73,29 @@ function applyFontSize() {
 }
 
 function checkNotify(prayerName) {
-  if (Notification.permission === 'granted') {
+  if (window.Notification && Notification.permission === 'granted') {
     new Notification('رفيق المسلم', { body: 'حان الآن موعد صلاة ' + prayerName, icon: './assets/img/icon-192.png' });
   }
 }
 
 function initUI() {
-  qs('#btnTextInc').addEventListener('click', () => { currentFontSize += 0.1; applyFontSize(); });
-  qs('#btnTextDec').addEventListener('click', () => { currentFontSize = Math.max(1, currentFontSize - 0.1); applyFontSize(); });
-  qs('#toggleTashkeel').addEventListener('click', () => { 
+  qs('#btnTextInc')?.addEventListener('click', () => { currentFontSize += 0.1; applyFontSize(); });
+  qs('#btnTextDec')?.addEventListener('click', () => { currentFontSize = Math.max(1, currentFontSize - 0.1); applyFontSize(); });
+  qs('#toggleTashkeel')?.addEventListener('click', () => { 
     showTashkeel = !showTashkeel; LS('tashkeel', showTashkeel);
-    if(loaded.adhkar) {
+    if(loaded.adhkar && rawAdhkarData) {
       const activeBtn = qs('#adhkarPills button.active');
-      if(activeBtn) renderDhikrList(qs('#adhkarContainer'), rawAdhkarData[activeBtn.dataset.key], activeBtn.dataset.key);
+      if(activeBtn) renderDhikrList(qs('#adhkarContainer'), rawAdhkarData[activeBtn.dataset.key]||[], activeBtn.dataset.key);
     }
   });
-  qs('#btnNotify').addEventListener('click', () => {
+  qs('#btnNotify')?.addEventListener('click', () => {
     if(!('Notification' in window)) return alert('متصفحك لا يدعم التنبيهات');
-    Notification.requestPermission().then(p => {
-      if(p==='granted') alert('تم تفعيل تنبيهات الأذان بنجاح ✓');
-    });
+    Notification.requestPermission().then(p => { if(p==='granted') alert('تم تفعيل تنبيهات الأذان بنجاح ✓'); });
   });
   
   let hijriAdj = parseInt(LS('hijriAdj')) || 0;
   const hSel = qs('#hijriAdjSelect');
-  if(hSel){
-    hSel.value = String(hijriAdj);
-    hSel.addEventListener('change', (e) => { LS('hijriAdj', parseInt(e.target.value)); renderHijri(); });
-  }
+  if(hSel){ hSel.value = String(hijriAdj); hSel.addEventListener('change', (e) => { LS('hijriAdj', parseInt(e.target.value)); renderHijri(); }); }
   applyFontSize();
 }
 
@@ -124,14 +137,10 @@ async function loadPrayerTimes(forceCity=false){
   const today=new Date(), tomorrow=new Date(Date.now()+86400000), c=getCityFallback(); 
 
   const renderTimes = (T, TT, T_True) => {
-    ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(k=>{
-      const el = qs('#t_'+k.toLowerCase()+'_s'); if(el) el.textContent = formatTime12h(isoToDate(T[k]));
-    }); 
-    const trueIshaTime = isoToDate(T_True.Isha);
-    const elTrueIsha = qs('#t_isha_true_s'); if(elTrueIsha) elTrueIsha.textContent = formatTime12h(trueIshaTime);
+    ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(k=>{ const el = qs('#t_'+k.toLowerCase()+'_s'); if(el) el.textContent = formatTime12h(isoToDate(T[k])); }); 
+    const trueIshaTime = isoToDate(T_True.Isha); const elTrueIsha = qs('#t_isha_true_s'); if(elTrueIsha) elTrueIsha.textContent = formatTime12h(trueIshaTime);
     setText('t_fajr_e', formatTime12h(isoToDate(T.Sunrise))); setText('t_dhuhr_e', formatTime12h(isoToDate(T.Asr)));
-    setText('t_asr_e', formatTime12h(isoToDate(T.Maghrib))); setText('t_maghrib_e', formatTime12h(trueIshaTime));
-    setText('t_isha_e', formatTime12h(isoToDate(T.Midnight)));
+    setText('t_asr_e', formatTime12h(isoToDate(T.Maghrib))); setText('t_maghrib_e', formatTime12h(trueIshaTime)); setText('t_isha_e', formatTime12h(isoToDate(T.Midnight)));
     const duha=computeDuha(T.Sunrise,T.Dhuhr); setText('t_duha_s', formatTime12h(duha.start)); setText('t_duha_e', formatTime12h(duha.end)); 
     const last=computeLastThird(T.Maghrib,TT.Fajr); setText('t_lastthird_s', formatTime12h(last.start)); setText('t_lastthird_e', formatTime12h(last.end)); 
     renderNextPrayer(T,TT.Fajr);
@@ -143,16 +152,14 @@ async function loadPrayerTimes(forceCity=false){
       const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:12000,maximumAge:600000})); 
       const lat=pos.coords.latitude, lon=pos.coords.longitude; 
       const acc = Math.round(pos.coords.accuracy||0); let accText = 'عالية';
-      if(acc > 500) { accText = 'سيئة'; if(controls) controls.style.display = 'flex'; }
-      else { if(acc > 50) accText = 'متوسطة'; if(controls) controls.style.display = 'none'; }
+      if(acc > 500) { accText = 'سيئة'; if(controls) controls.style.display = 'flex'; } else { if(acc > 50) accText = 'متوسطة'; if(controls) controls.style.display = 'none'; }
       setText('ptMeta', `دقة الموقع: ${accText}`);
       const rg=reverseGeocodeCity(lat,lon).catch(()=>null); 
       const td=await fetchTimingsByCoords(today,lat,lon); const td2=await fetchTimingsByCoords(tomorrow,lat,lon); const tdTrue=await fetchTimingsByCoords(today,lat,lon, 3); 
       const city=await rg; updateCityKPI(city&&city.city?city.city:'موقعي'); setQiblaFromCoords(lat,lon);
       renderTimes(td.timings, td2.timings, tdTrue.timings);
     } else {
-      if(controls) controls.style.display = 'flex';
-      updateCityKPI(c.label||c.city); 
+      if(controls) controls.style.display = 'flex'; updateCityKPI(c.label||c.city); 
       const td=await fetchTimingsByCity(today,c.city,c.country); const td2=await fetchTimingsByCity(tomorrow,c.city,c.country); const tdTrue=await fetchTimingsByCity(today,c.city,c.country, 3);
       renderTimes(td.timings, td2.timings, tdTrue.timings);
     } 
@@ -173,35 +180,23 @@ function dayKey(){return new Date().toDateString()}
 function updateGlobalProgress(list, keyPrefix) {
   const bar = qs('#globalAdhkarProgress'); if(!bar) return;
   if(list.length === 0) { bar.style.width = '0%'; return; }
-  const completed = list.filter((it, i) => {
-    const k=`dhikr:${keyPrefix}:${i}:${dayKey()}`;
-    const rem = LS(k);
-    if(typeof it.repeat === 'number') return rem === '0';
-    return true; 
-  }).length;
+  const completed = list.filter((it, i) => { const k=`dhikr:${keyPrefix}:${i}:${dayKey()}`; const rem = LS(k); if(typeof it.repeat === 'number') return rem === '0'; return true; }).length;
   bar.style.width = Math.round((completed / list.length) * 100) + '%';
 }
 
 function renderPager(container,list,keyPrefix){
-  updateGlobalProgress(list, keyPrefix);
+  if(!list) return; updateGlobalProgress(list, keyPrefix);
   let index=parseInt(LS(`pager:${keyPrefix}:index`)||'0',10); if(Number.isNaN(index)||index<0||index>=list.length) index=0; 
-  const host=document.createElement('div'); host.className='pager-wrap'; 
-  const indexEl=document.createElement('div'); indexEl.className='pager-index'; 
-  const card=document.createElement('div'); card.className='pager-card'; 
-  const controls=document.createElement('div'); controls.className='pager-controls'; 
-  const prev=document.createElement('button'); prev.className='btn secondary'; prev.textContent='السابق'; 
-  const next=document.createElement('button'); next.className='btn'; next.textContent='التالي'; 
+  const host=document.createElement('div'); host.className='pager-wrap'; const indexEl=document.createElement('div'); indexEl.className='pager-index'; const card=document.createElement('div'); card.className='pager-card'; const controls=document.createElement('div'); controls.className='pager-controls'; const prev=document.createElement('button'); prev.className='btn secondary'; prev.textContent='السابق'; const next=document.createElement('button'); next.className='btn'; next.textContent='التالي'; 
   controls.append(prev,next); host.append(indexEl,card,controls); container.appendChild(host); 
   
   function update(){
-    const it=list[index]; const max=it.repeat; const numeric=typeof max==='number'; const repeatedOnce=numeric&&max===1; 
+    const it=list[index]; if(!it) return; const max=it.repeat; const numeric=typeof max==='number'; const repeatedOnce=numeric&&max===1; 
     const k=`dhikr:${keyPrefix}:${index}:${dayKey()}`; let rem=LS(k); rem=rem==null?(numeric?max:0):parseInt(rem,10); if(!numeric) rem=0; 
     const pct=numeric&&max>0?Math.round(((max-rem)/max)*100):0; indexEl.textContent=`${index+1} / ${list.length}`; 
     const whenHtml=it.when?`<span class="when-chip">${it.when}</span>`:''; 
     const repeatHtml=repeatedOnce?'':`<button class="btn ${numeric?'':'secondary'} repeat-square ${numeric&&rem===0?'done':''} ${(!numeric||String(max).length>2)?'wide':''} do">${numeric?(rem===0?'تم':String(rem)):String(max)}</button>`; 
-    
-    const displayText = showTashkeel ? it.text : it.text.replace(/[\u064B-\u065F\u0640]/g, '');
-
+    const displayText = showTashkeel ? it.text : (it.text||'').replace(/[\u064B-\u065F\u0640]/g, '');
     card.innerHTML=`<p class="dhikr-text">${displayText}</p><div class="pager-meta"><span>المصدر: ${it.source||'—'}</span>${whenHtml}</div>${numeric&&!repeatedOnce?'<div class="progress"><div style="width:'+pct+'%"></div></div>':''}<div class="actions"><div class="left"><button class="btn secondary tiny copy">نسخ</button><a class="mini-link" href="${it.ref||'#'}" target="_blank" rel="noopener">مرجع</a></div>${repeatHtml}</div>`; 
     card.querySelector('.copy')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(displayText); haptic(8);}catch(e){}}); 
     const btn=card.querySelector('.do'); const bar=card.querySelector('.progress>div'); 
@@ -214,21 +209,27 @@ function renderPager(container,list,keyPrefix){
     } 
     if(btn&&!numeric) btn.disabled=true; prev.disabled=index===0; next.disabled=index===list.length-1; LS(`pager:${keyPrefix}:index`,String(index));
   } 
-  prev.addEventListener('click',()=>{if(index>0){index-=1; update(); haptic(8);}}); 
-  next.addEventListener('click',()=>{if(index<list.length-1){index+=1; update(); haptic(8);}}); 
+  prev.addEventListener('click',()=>{if(index>0){index-=1; update(); haptic(8);}}); next.addEventListener('click',()=>{if(index<list.length-1){index+=1; update(); haptic(8);}}); 
   update();
 }
 function renderDhikrList(container,list,keyPrefix){container.innerHTML=''; renderPager(container,list,keyPrefix);}
+
 async function loadAdhkar(){
-  rawAdhkarData=await (await fetch('./data/adhkar.json')).json(); 
+  const fallbackData = {"morning":[],"evening":[],"sleep":[],"wakeup":[],"afterPrayer":[],"home":[],"mosque":[],"daily":[]};
+  rawAdhkarData = await fetchJSON('./data/adhkar.json', fallbackData);
   const tabs=[{key:'morning',label:'الصباح'},{key:'evening',label:'المساء'},{key:'sleep',label:'النوم'},{key:'wakeup',label:'الاستيقاظ'},{key:'afterPrayer',label:'بعد الصلاة'},{key:'home',label:'المنزل'},{key:'mosque',label:'المسجد'},{key:'daily',label:'متفرقة'}]; 
   const pills=qs('#adhkarPills'), container=qs('#adhkarContainer'); if(!pills||!container) return; 
-  function activate(key){qsa('#adhkarPills button').forEach(b=>b.classList.toggle('active',b.dataset.key===key)); renderDhikrList(container,rawAdhkarData[key],key);} 
+  function activate(key){qsa('#adhkarPills button').forEach(b=>b.classList.toggle('active',b.dataset.key===key)); renderDhikrList(container,rawAdhkarData[key]||[],key);} 
   pills.innerHTML=''; tabs.forEach(t=>{const b=document.createElement('button'); b.textContent=t.label; b.dataset.key=t.key; b.addEventListener('click',()=>activate(t.key)); pills.appendChild(b);}); activate('morning');
 }
-async function loadResources(){const data=await (await fetch('./data/resources.json')).json(); const host=qs('#usefulLinks'); if(!host) return; host.innerHTML=''; (data.useful||[]).forEach(g=>{const sec=document.createElement('div'); sec.className='pager-card'; sec.innerHTML=`<h3 style="margin:0 0 8px">${g.group}</h3>`; const ul=document.createElement('ul'); (g.items||[]).forEach(it=>{const li=document.createElement('li'); li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a> <span class="small">— ${it.desc||''}</span>`; ul.appendChild(li);}); sec.appendChild(ul); host.appendChild(sec);});}
-async function loadLearning(){const data=await (await fetch('./data/learning.json')).json(); const plan=qs('#learnPlan'), col=qs('#learnCollections'), rem=qs('#learnReminders'); if(plan){plan.innerHTML=''; (data.plan||[]).forEach(it=>{const d=document.createElement('div'); d.className='pager-card'; d.innerHTML=`<b>${it.title}</b><div class="small">${it.tip}</div>`; plan.appendChild(d);});} if(col){col.innerHTML=''; (data.collections||[]).forEach(it=>{const li=document.createElement('li'); li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>`; col.appendChild(li);});} if(rem){rem.innerHTML=''; (data.reminders||[]).forEach(t=>{const li=document.createElement('li'); li.textContent=t; rem.appendChild(li);});}}
+async function loadResources(){const data = await fetchJSON('./data/resources.json', {useful:[]}); const host=qs('#usefulLinks'); if(!host) return; host.innerHTML=''; (data.useful||[]).forEach(g=>{const sec=document.createElement('div'); sec.className='pager-card'; sec.innerHTML=`<h3 class="section-title">${g.group}</h3>`; const ul=document.createElement('ul'); ul.className='custom-list'; (g.items||[]).forEach(it=>{const li=document.createElement('li'); li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a> <span class="small" style="display:block; margin-top:4px;">${it.desc||''}</span>`; ul.appendChild(li);}); sec.appendChild(ul); host.appendChild(sec);});}
+async function loadLearning(){const data = await fetchJSON('./data/learning.json', {plan:[], collections:[], reminders:[]}); const plan=qs('#learnPlan'), col=qs('#learnCollections'), rem=qs('#learnReminders'); if(plan){plan.innerHTML=''; (data.plan||[]).forEach(it=>{const d=document.createElement('div'); d.className='pager-card'; d.innerHTML=`<b style="font-size:1.4rem; color:var(--accent); display:block; margin-bottom:8px;">${it.title}</b><div style="font-size:1.3rem; line-height:1.8;">${it.tip}</div>`; plan.appendChild(d);});} if(col){col.innerHTML=''; (data.collections||[]).forEach(it=>{const li=document.createElement('li'); li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>`; col.appendChild(li);});} if(rem){rem.innerHTML=''; (data.reminders||[]).forEach(t=>{const li=document.createElement('li'); li.textContent=t; rem.appendChild(li);});}}
 function showUpdateBar(reg){const bar=qs('#updateBar'); if(!bar) return; bar.style.display='flex'; qs('#updateNow')?.addEventListener('click',()=>{if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});},{once:true}); qs('#updateLater')?.addEventListener('click',()=>{bar.style.display='none';},{once:true});}
 async function registerSW(){if(!('serviceWorker' in navigator)) return; const reg=await navigator.serviceWorker.register('./service-worker.js',{scope:'./'}); try{await reg.update();}catch(e){} navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload(),{once:true}); if(reg.waiting) showUpdateBar(reg); reg.addEventListener('updatefound',()=>{const sw=reg.installing; if(!sw) return; sw.addEventListener('statechange',()=>{if(sw.state==='installed'&&navigator.serviceWorker.controller) showUpdateBar(reg);});});}
-async function init(){CFG=await (await fetch('./assets/js/config.json')).json(); initScheme(); initUI(); initNav(); initCityList(); renderHijri(); loadStoredQibla(); setupCompass(); setupTasbeeh(); qs('#useLocation')?.addEventListener('click',()=>loadPrayerTimes(false)); await loadPrayerTimes(false); await registerSW();}
+
+async function init(){
+  const fallbackConfig = { calculation: { method: 4, school: 0 }, duha: { startOffsetAfterSunriseMin: 15, endOffsetBeforeDhuhrMin: 10 }, defaultCity: { label: 'مكة المكرمة', city: 'Makkah', country: 'SA' } };
+  CFG = await fetchJSON('./assets/js/config.json', fallbackConfig); 
+  initScheme(); initUI(); initNav(); initCityList(); renderHijri(); loadStoredQibla(); setupCompass(); setupTasbeeh(); qs('#useLocation')?.addEventListener('click',()=>loadPrayerTimes(false)); await loadPrayerTimes(false); await registerSW();
+}
 window.addEventListener('load',init);
