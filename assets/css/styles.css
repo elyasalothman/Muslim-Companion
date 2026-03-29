@@ -171,3 +171,42 @@ main{max-width:1400px;margin:0 auto;padding:12px;display:grid;gap:12px}
   .repeat-square{width:52px;min-width:52px;height:52px;font-size:16px !important}
   #updateBar{width:calc(100% - 16px);bottom:80px}
 }
+/* تثبيت الشريط العلوي دائم الظهور */
+header {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+/* تثبيت الشريط السفلي أسفل الشاشة */
+.fixed-footer, .footer {
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+/* إزاحة المحتوى كي لا يختفي خلف الأشرطة المثبتة */
+body {
+  padding-top: 80px !important; 
+  padding-bottom: 80px !important;
+}
+
+/* تصميم أزرار الألوان الدائرية الصغيرة */
+.color-dot {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  border: 2px solid rgba(255,255,255,0.2) !important;
+  cursor: pointer;
+  padding: 0 !important;
+  min-height: auto !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.color-dot:hover {
+  border-color: var(--fg) !important;
+  transform: scale(1.1);
+}
