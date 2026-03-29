@@ -2,11 +2,11 @@
 <html lang="ar" dir="rtl" data-theme="dark" data-scheme="brown">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <meta name="theme-color" content="#1a1410"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <link rel="icon" href="./assets/img/icon-192.png"/>
-  <link rel="stylesheet" href="./assets/css/styles.css?v=0.2.5"/>
+  <link rel="stylesheet" href="./assets/css/styles.css?v=0.2.6"/>
   <title>رفيق المسلم</title>
 </head>
 <body>
@@ -15,10 +15,10 @@
     <div class="brand"><img src="./assets/img/logo.svg" alt=""/><span>رفيق المسلم</span></div>
     <div class="toolbar" style="display: flex; gap: 12px; align-items: center;">
       <div style="display: flex; gap: 8px;">
-        <button class="color-dot" data-val="white" style="background-color: #f8f9fa;" title="أبيض"></button>
-        <button class="color-dot" data-val="black" style="background-color: #141414;" title="أسود"></button>
-        <button class="color-dot" data-val="brown" style="background-color: #8b5e34;" title="بني"></button>
-        <button class="color-dot" data-val="gray" style="background-color: #70757a;" title="رصاصي"></button>
+        <button class="color-dot" data-val="white" style="background-color: #f8f9fa;" title="ورقي (أبيض)"></button>
+        <button class="color-dot" data-val="black" style="background-color: #141414;" title="مسطح (أسود)"></button>
+        <button class="color-dot" data-val="brown" style="background-color: #8b5e34;" title="كلاسيكي (بني)"></button>
+        <button class="color-dot" data-val="gray" style="background-color: #70757a;" title="زجاجي (رصاصي)"></button>
       </div>
       <button id="toggleTheme" title="الوضع الليلي/النهاري" style="font-size: 1.3rem; background: transparent; border: none; padding: 0; min-height: auto;">🌙</button>
     </div>
@@ -40,24 +40,29 @@
         <button class="btn" id="useLocation" title="تحديد موقعي التلقائي" style="padding: 0 16px; font-size: 1.4rem;">📍</button>
         <select id="citySelect" style="flex: 1;"><option value="">— اختر مدينة يدوياً —</option></select>
       </div>
-      <div class="small" id="ptStatus" style="margin-top: 6px;"></div>
+      <div class="small" id="ptStatus" style="margin-top: 6px; text-align: center;"></div>
 
       <div class="table-wrap">
         <table class="table" style="margin-top:10px">
-          <tr><th>الفجر</th><td id="t_fajr">—</td></tr>
-          <tr class="minor"><th>الشروق</th><td id="t_sunrise">—</td></tr>
-          <tr><th>الضحى</th><td id="t_duha">—</td></tr>
-          <tr><th>الظهر</th><td id="t_dhuhr">—</td></tr>
-          <tr><th>العصر</th><td id="t_asr">—</td></tr>
-          <tr><th>المغرب</th><td id="t_maghrib">—</td></tr>
-          <tr><th>العشاء</th><td id="t_isha">—</td></tr>
-          <tr class="minor"><th>الثلث الأخير</th><td id="t_lastthird">—</td></tr>
+          <thead>
+            <tr>
+              <th style="text-align: right;">الصلاة</th>
+              <th style="text-align: center;">دخول</th>
+              <th style="text-align: center;">خروج</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="tr_Fajr"><th>الفجر</th><td id="t_fajr_s" style="text-align: center; font-weight: bold;">—</td><td id="t_fajr_e" class="small" style="text-align: center;">—</td></tr>
+            <tr class="minor" id="tr_Sunrise"><th>الشروق</th><td id="t_sunrise_s" style="text-align: center; font-weight: bold;">—</td><td id="t_sunrise_e" class="small" style="text-align: center;">—</td></tr>
+            <tr id="tr_Duha"><th>الضحى</th><td id="t_duha_s" style="text-align: center; font-weight: bold;">—</td><td id="t_duha_e" class="small" style="text-align: center;">—</td></tr>
+            <tr id="tr_Dhuhr"><th>الظهر</th><td id="t_dhuhr_s" style="text-align: center; font-weight: bold;">—</td><td id="t_dhuhr_e" class="small" style="text-align: center;">—</td></tr>
+            <tr id="tr_Asr"><th>العصر</th><td id="t_asr_s" style="text-align: center; font-weight: bold;">—</td><td id="t_asr_e" class="small" style="text-align: center;">—</td></tr>
+            <tr id="tr_Maghrib"><th>المغرب</th><td id="t_maghrib_s" style="text-align: center; font-weight: bold;">—</td><td id="t_maghrib_e" class="small" style="text-align: center;">—</td></tr>
+            <tr id="tr_Isha"><th>العشاء</th><td id="t_isha_s" style="text-align: center; font-weight: bold;">—</td><td id="t_isha_e" class="small" style="text-align: center;">—</td></tr>
+            <tr class="minor" id="tr_Lastthird"><th>الثلث الأخير</th><td id="t_lastthird_s" style="text-align: center; font-weight: bold;">—</td><td id="t_lastthird_e" class="small" style="text-align: center;">—</td></tr>
+          </tbody>
         </table>
       </div>
-      <p class="small" style="margin:10px 0 0; line-height: 1.8;">
-        • <b>الضحى:</b> يبدأ بعد الشروق بـ 15 دقيقة وينتهي قبل الظهر بـ 10 دقائق.<br>
-        • <b>الثلث الأخير من الليل:</b> يُحسب بتقسيم إجمالي الوقت من أذان المغرب إلى أذان الفجر على ثلاثة، ويبدأ بدخول الجزء الثالث.
-      </p>
     </section>
 
     <section id="qibla" class="section">
@@ -104,18 +109,12 @@
     <section id="resources" class="section">
       <div id="usefulLinks"></div>
     </section>
-
   </div>
 </main>
 
 <div id="updateBar">
   <div class="msg">تحديث جديد متوفر</div>
   <div class="row" style="margin:0"><button class="btn" id="updateNow">تحديث الآن</button><button class="btn secondary" id="updateLater">لاحقًا</button></div>
-</div>
-
-<div class="normal-footer">
-  <div class="footer-brand" id="footerBrand">رفيق المسلم</div>
-  <div class="footer-version" id="footerVersion">الإصدار 0.2.5</div>
 </div>
 
 <nav class="bottom-nav">
@@ -127,6 +126,10 @@
   <button data-target="resources" title="روابط">🔗</button>
 </nav>
 
-<script src="./assets/js/app.js?v=0.2.5" type="module"></script>
+<div class="tiny-footer">
+  رفيق المسلم - الإصدار 0.2.6
+</div>
+
+<script src="./assets/js/app.js?v=0.2.6" type="module"></script>
 </body>
 </html>
