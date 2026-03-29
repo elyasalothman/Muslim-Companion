@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1a1410"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <link rel="icon" href="./assets/img/icon-192.png"/>
-  <link rel="stylesheet" href="./assets/css/styles.css?v=0.2.9"/>
+  <link rel="stylesheet" href="./assets/css/styles.css?v=0.3.0"/>
   <title>رفيق المسلم</title>
 </head>
 <body>
@@ -59,8 +59,7 @@
             <tr id="tr_Maghrib"><th>المغرب</th><td id="t_maghrib_s" style="text-align: center; font-weight: bold;">—</td><td id="t_maghrib_e" class="small" style="text-align: center; color: var(--accent2); font-weight: bold;">—</td></tr>
             <tr id="tr_Isha"><th>العشاء</th>
               <td style="text-align: center; font-weight: bold;">
-                <span id="t_isha_s">—</span>
-                <span class="small" style="display: block; color: var(--accent2); font-weight: normal; margin-top: 2px;">(حقيقي: <span id="t_isha_true_s">—</span>)</span>
+                <span id="t_isha_s">—</span> <span style="font-weight: normal; margin: 0 4px; color: var(--muted);">|</span> فعلي: <span id="t_isha_true_s">—</span>
               </td>
               <td id="t_isha_e" class="small" style="text-align: center;">—</td>
             </tr>
@@ -68,10 +67,6 @@
           </tbody>
         </table>
       </div>
-      <p class="small" style="margin:10px 0 0; line-height: 1.8;">
-        • <b>تنبيه:</b> وقت المغرب ينتهي شرعاً بمغيب الشفق الأحمر (وقت العشاء الحقيقي)، فلا تؤخر صلاتك للأذان الرسمي.<br>
-        • <b>الثلث الأخير:</b> يُحسب بتقسيم إجمالي الوقت من أذان المغرب إلى أذان الفجر على ثلاثة.
-      </p>
     </section>
 
     <section id="qibla" class="section">
@@ -136,9 +131,9 @@
 </nav>
 
 <div class="tiny-footer">
-  رفيق المسلم - الإصدار 0.2.9
+  رفيق المسلم - الإصدار 0.3.0
 </div>
 
-<script src="./assets/js/app.js?v=0.2.9" type="module"></script>
+<script src="./assets/js/app.js?v=0.3.0" type="module"></script>
 </body>
 </html>
