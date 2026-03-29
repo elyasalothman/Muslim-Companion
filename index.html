@@ -6,15 +6,25 @@
   <meta name="theme-color" content="#1a1410"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <link rel="icon" href="./assets/img/icon-192.png"/>
-  <link rel="stylesheet" href="./assets/css/styles.css?v=0.6.2"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap"/>
+  <link rel="stylesheet" href="./assets/css/styles.css?v=0.6.3"/>
   <title>رفيق المسلم</title>
 </head>
 <body>
 <header>
   <div class="header-wrap">
     <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 100 100" style="margin-left: 10px;">
+        <defs>
+          <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#d4af37;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#8b6d1b;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <path d="M50 10 L55 40 L85 45 L55 50 L50 80 L45 50 L15 45 L45 40 Z" fill="url(#glowGrad)" />
+        <circle cx="50" cy="45" r="12" fill="#fff" opacity="0.5" />
+      </svg>
       <span>رفيق المسلم</span>
-      <img src="./assets/img/logo.svg" alt="" style="margin-right: 8px;"/>
     </div>
   </div>
 </header>
@@ -41,13 +51,9 @@
       <div class="small" id="ptStatus" style="margin-top: 6px; text-align: center;"></div>
 
       <div class="table-wrap">
-        <table class="table" style="margin-top:10px">
+        <table class="table">
           <thead>
-            <tr>
-              <th style="text-align: right;">الصلاة</th>
-              <th style="text-align: center;">دخول</th>
-              <th style="text-align: center;">خروج</th>
-            </tr>
+            <tr><th style="text-align: right;">الصلاة</th><th style="text-align: center;">دخول</th><th style="text-align: center;">خروج</th></tr>
           </thead>
           <tbody>
             <tr id="tr_Fajr"><th>الفجر</th><td id="t_fajr_s" style="text-align: center;">—</td><td id="t_fajr_e" style="text-align: center;">—</td></tr>
@@ -55,10 +61,7 @@
             <tr id="tr_Dhuhr"><th>الظهر</th><td id="t_dhuhr_s" style="text-align: center;">—</td><td id="t_dhuhr_e" style="text-align: center;">—</td></tr>
             <tr id="tr_Asr"><th>العصر</th><td id="t_asr_s" style="text-align: center;">—</td><td id="t_asr_e" style="text-align: center;">—</td></tr>
             <tr id="tr_Maghrib"><th>المغرب</th><td id="t_maghrib_s" style="text-align: center;">—</td><td id="t_maghrib_e" style="text-align: center;">—</td></tr>
-            <tr id="tr_Isha"><th>العشاء</th>
-              <td style="text-align: center;"><span id="t_isha_s">—</span><span style="margin: 0 6px;">|</span>فعلي: <span id="t_isha_true_s">—</span></td>
-              <td id="t_isha_e" style="text-align: center;">—</td>
-            </tr>
+            <tr id="tr_Isha"><th>العشاء</th><td style="text-align: center;"><span id="t_isha_s">—</span><span style="margin: 0 6px;">|</span>فعلي: <span id="t_isha_true_s">—</span></td><td id="t_isha_e" style="text-align: center;">—</td></tr>
             <tr class="minor" id="tr_Lastthird"><th>الثلث الأخير</th><td id="t_lastthird_s" style="text-align: center;">—</td><td id="t_lastthird_e" style="text-align: center;">—</td></tr>
           </tbody>
         </table>
@@ -66,7 +69,7 @@
     </section>
 
     <section id="qibla" class="section">
-      <p style="text-align: center; font-weight: bold; font-size: 1.3rem;">زاوية القبلة: <span id="qiblaDeg" style="color: var(--accent);">—</span></p>
+      <p style="text-align: center; font-weight: bold; font-size: 1.4rem;">زاوية القبلة: <span id="qiblaDeg" style="color: var(--accent);">—</span></p>
       <div class="compass">
         <div class="dial"></div>
         <div id="needle" class="needle"></div>
@@ -74,102 +77,26 @@
       <div class="row" style="justify-content: center; margin-top: 20px;">
         <button class="btn" id="enableCompass" style="font-size: 1.4rem;">تفعيل البوصلة الذكية 🧭</button>
       </div>
-      <div class="small" id="compassStatus" style="text-align: center; margin-top: 10px;"></div>
-      <div class="small" id="compassAccuracy" style="text-align: center;"></div>
+      <div id="compassStatus" style="text-align: center; margin-top: 12px; font-weight: bold; min-height: 1.5em;"></div>
+      <div class="small" id="compassAccuracy" style="text-align: center; color: var(--muted);"></div>
     </section>
 
-    <section id="adhkar" class="section">
-      <div id="adhkarPills" class="pills"></div>
-      <div class="progress" style="margin-bottom: 20px; height: 14px; border-radius: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);"><div id="globalAdhkarProgress" style="width:0; background:var(--accent);"></div></div>
-      <div id="adhkarContainer"></div>
-    </section>
-
-    <section id="tasbeeh" class="section">
-      <div class="tasbeeh-wrap">
-        <div class="tasbeeh-meta">
-          <select id="tasbeehPhraseSelect" aria-label="اختيار التسبيح"></select>
-          <button class="btn secondary" id="tasbeehNext" style="font-size: 1.4rem;">التالي</button>
-        </div>
-        <div class="current-tasbeeh" id="currentTasbeeh">سُبْحَانَ اللَّهِ</div>
-        <div class="tasbeeh-kpi">
-          <div class="card inner-card"><div class="kpi"><div class="label">العدّاد</div><div class="tasbeeh-counter" id="tasbeehCount">0</div></div></div>
-          <div class="card inner-card"><div class="kpi"><div class="label">الهدف</div><div class="tasbeeh-target" id="tasbeehTarget">الهدف: 33</div></div></div>
-        </div>
-        <div class="tasbeeh-main-btn-wrap"><button class="tasbeeh-btn" id="tasbeehBtn">سَبِّح</button></div>
-        <div class="tasbeeh-secondary-row"><button class="btn danger tasbeeh-reset-small" id="tasbeehReset">تصفير</button></div>
-      </div>
-    </section>
-
-    <section id="learning" class="section">
-      <h3 class="section-title">فائدة اليوم</h3>
-      <div class="pager-card" style="margin-bottom: 24px; text-align: center;">
-        <p id="dailyBenefitContent" style="font-size: 1.6rem; color: var(--accent); font-weight: bold; line-height: 1.8;">جاري تحميل الفائدة...</p>
-      </div>
-
-      <h3 class="section-title">خطط مختصرة</h3><div id="learnPlan"></div>
-      <h3 class="section-title" style="margin-top: 24px;">مختارات علمية</h3><ul id="learnCollections" class="custom-list"></ul>
-      <h3 class="section-title" style="margin-top: 24px;">تذكيرات</h3><ul id="learnReminders" class="custom-list"></ul>
-      
-      <h3 class="section-title" style="margin-top: 24px;">روابط مفيدة</h3>
-      <div id="usefulLinks"></div>
-    </section>
-
-    <section id="settings" class="section">
-      <h3 class="section-title">إعدادات التطبيق</h3>
-      
-      <div class="pager-card" style="margin-bottom: 16px;">
-        <div style="font-weight: bold; color: var(--accent); margin-bottom: 12px;">المظهر والألوان:</div>
-        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-          <button class="color-dot" data-val="white" style="background-color: #f8f9fa;" title="ورقي"></button>
-          <button class="color-dot" data-val="black" style="background-color: #141414;" title="مسطح"></button>
-          <button class="color-dot" data-val="brown" style="background-color: #d4af37;" title="كلاسيكي"></button>
-          <button class="color-dot" data-val="gray" style="background-color: #70757a;" title="زجاجي"></button>
-          <button class="color-dot" data-val="colorful" style="background: linear-gradient(45deg, #06b6d4, #8b5cf6);" title="ملون"></button>
-        </div>
-      </div>
-
-      <div class="pager-card" style="margin-bottom: 16px;">
-        <div style="font-weight: bold; color: var(--accent); margin-bottom: 12px;">القراءة والتنبيهات:</div>
-        <div style="display: grid; gap: 10px; grid-template-columns: 1fr 1fr;">
-           <button id="toggleTashkeel" class="btn secondary" style="font-size: 1.2rem;">التشكيل (بَ/ب)</button>
-           <button id="btnNotify" class="btn secondary" style="font-size: 1.2rem;">تنبيه الأذان 🔔</button>
-           <button id="btnTextInc" class="btn secondary" style="font-size: 1.2rem;">تكبير الخط (A+)</button>
-           <button id="btnTextDec" class="btn secondary" style="font-size: 1.2rem;">تصغير الخط (A-)</button>
-        </div>
-      </div>
-
-      <div class="pager-card" style="margin-bottom: 24px;">
-        <div style="font-weight: bold; color: var(--accent); margin-bottom: 10px;">ضبط التاريخ الهجري:</div>
-        <select id="hijriAdjSelect" style="width: 100%; border: 1px solid var(--border); background: var(--bg); color: var(--fg); border-radius: var(--radius); padding: 12px; font-family: 'Amiri', serif; font-size: 1.2rem; outline: none;">
-          <option value="-2">تقديم يومين (-٢)</option>
-          <option value="-1">تقديم يوم (-١)</option>
-          <option value="0" selected>مطابق للتقويم (دقيق)</option>
-          <option value="1">تأخير يوم (+١)</option>
-          <option value="2">تأخير يومين (+٢)</option>
-        </select>
-      </div>
-      
-      <div style="text-align: center; padding: 20px 10px; color: var(--muted); font-size: 1.2rem; font-weight: bold; font-family: Arial, sans-serif;">
-        الإصدار 0.6.2
-      </div>
-    </section>
+    <section id="adhkar" class="section"><div id="adhkarPills" class="pills"></div><div class="progress" style="margin-bottom: 20px; height: 14px;"><div id="globalAdhkarProgress" style="width:0; background:var(--accent);"></div></div><div id="adhkarContainer"></div></section>
+    <section id="tasbeeh" class="section"><div class="tasbeeh-wrap"><div class="tasbeeh-meta"><select id="tasbeehPhraseSelect"></select><button class="btn secondary" id="tasbeehNext">التالي</button></div><div class="current-tasbeeh" id="currentTasbeeh">سُبْحَانَ اللَّهِ</div><div class="tasbeeh-kpi"><div class="card inner-card"><div class="kpi"><div class="label">العدّاد</div><div class="tasbeeh-counter" id="tasbeehCount">0</div></div></div><div class="card inner-card"><div class="kpi"><div class="label">الهدف</div><div class="tasbeeh-target" id="tasbeehTarget">الهدف: 33</div></div></div></div><div class="tasbeeh-main-btn-wrap"><button class="tasbeeh-btn" id="tasbeehBtn">سَبِّح</button></div><div class="tasbeeh-secondary-row"><button class="btn danger tasbeeh-reset-small" id="tasbeehReset">تصفير</button></div></div></section>
+    <section id="learning" class="section"><h3 class="section-title">فائدة اليوم</h3><div class="pager-card" style="margin-bottom: 24px; text-align: center;"><p id="dailyBenefitContent" style="font-size: 1.6rem; color: var(--accent); font-weight: bold;">جاري التحميل...</p></div><h3 class="section-title">خطط مختصرة</h3><div id="learnPlan"></div><h3 class="section-title" style="margin-top: 24px;">مختارات علمية</h3><ul id="learnCollections" class="custom-list"></ul><h3 class="section-title" style="margin-top: 24px;">روابط مفيدة</h3><div id="usefulLinks"></div></section>
+    <section id="settings" class="section"><h3 class="section-title">إعدادات التطبيق</h3><div class="pager-card" style="margin-bottom: 16px;"><div style="font-weight: bold; color: var(--accent); margin-bottom: 12px;">المظهر والألوان:</div><div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;"><button class="color-dot" data-val="white" style="background-color: #f8f9fa;"></button><button class="color-dot" data-val="black" style="background-color: #141414;"></button><button class="color-dot" data-val="brown" style="background-color: #d4af37;"></button><button class="color-dot" data-val="gray" style="background-color: #70757a;"></button><button class="color-dot" data-val="colorful" style="background: linear-gradient(45deg, #06b6d4, #8b5cf6);"></button></div></div><div class="pager-card" style="margin-bottom: 16px;"><div style="font-weight: bold; color: var(--accent); margin-bottom: 12px;">القراءة والتنبيهات:</div><div style="display: grid; gap: 10px; grid-template-columns: 1fr 1fr;"><button id="toggleTashkeel" class="btn secondary">التشكيل</button><button id="btnNotify" class="btn secondary">تنبيه الأذان 🔔</button><button id="btnTextInc" class="btn secondary">A+</button><button id="btnTextDec" class="btn secondary">A-</button></div></div><div style="text-align: center; padding: 20px; color: var(--muted); font-weight: bold;">الإصدار 0.6.3</div></section>
   </div>
 </main>
 
-<div id="updateBar">
-  <div class="msg">تحديث جديد متوفر</div>
-  <div class="row" style="margin:0"><button class="btn" id="updateNow">تحديث</button><button class="btn secondary" id="updateLater">لاحقًا</button></div>
-</div>
-
 <nav class="bottom-nav">
-  <button class="active" data-target="times" title="أوقات الصلاة">🕌</button>
-  <button data-target="qibla" title="القبلة">🧭</button>
-  <button data-target="adhkar" title="الأذكار">🤲</button>
-  <button data-target="tasbeeh" title="تسبيح">📿</button>
-  <button data-target="learning" title="تعلم">📚</button>
-  <button data-target="settings" title="الإعدادات">⚙️</button>
+  <button class="active" data-target="times">🕌</button>
+  <button data-target="qibla">🧭</button>
+  <button data-target="adhkar">🤲</button>
+  <button data-target="tasbeeh">📿</button>
+  <button data-target="learning">📚</button>
+  <button data-target="settings">⚙️</button>
 </nav>
 
-<script src="./assets/js/app.js?v=0.6.2" type="module"></script>
+<script src="./assets/js/app.js?v=0.6.3" type="module"></script>
 </body>
 </html>
