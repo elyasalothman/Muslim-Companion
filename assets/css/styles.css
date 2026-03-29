@@ -1,38 +1,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
 
-/* --- الألوان الأربعة --- */
-/* البني (الافتراضي الكلاسيكي) */
 :root, [data-scheme='brown'] {
   --bg: #1a1410; --bg2: #261b14; --card: rgba(255,255,255,.05); 
   --fg: #f7f0e7; --muted: #e6d8c8; --accent: #d9b98f; --accent2: #8b5e34; 
   --danger: #c2410c; --border: rgba(217,185,143,.2);
 }
-/* الأسود */
 [data-scheme='black'] {
   --bg: #050505; --bg2: #121212; --card: rgba(255,255,255,.03);
   --fg: #f5f5f5; --muted: #b3b3b3; --accent: #ffffff; --accent2: #525252; 
   --danger: #ef4444; --border: rgba(255,255,255,.15);
 }
-/* الرصاصي المريح */
 [data-scheme='gray'] {
   --bg: #1f2224; --bg2: #2b2e31; --card: rgba(255,255,255,.03);
   --fg: #e8eaed; --muted: #bdc1c6; --accent: #8ab4f8; --accent2: #5f6368; 
   --danger: #f28b82; --border: rgba(255,255,255,.15);
 }
-/* الأبيض */
 [data-scheme='white'] {
   --bg: #f8f9fa; --bg2: #ffffff; --card: rgba(0,0,0,.02);
   --fg: #202124; --muted: #5f6368; --accent: #1a73e8; --accent2: #dadce0; 
   --danger: #d93025; --border: rgba(0,0,0,.1);
 }
 
-/* الألوان في الوضع النهاري (في حال ضغط زر الشمس) */
 [data-theme='light'][data-scheme='brown'] { --bg: #fbf7f2; --bg2: #f4ede4; --fg: #1a1410; --muted: #7a6a5f; --border: rgba(139,94,52,.2); }
 [data-theme='light'][data-scheme='black'] { --bg: #f0f0f0; --bg2: #ffffff; --fg: #0a0a0a; --muted: #525252; --accent: #000000; --border: rgba(0,0,0,.15); }
 [data-theme='light'][data-scheme='gray'] { --bg: #f1f3f4; --bg2: #ffffff; --fg: #202124; --muted: #5f6368; --accent: #1a73e8; --border: rgba(0,0,0,.15); }
 [data-theme='light'][data-scheme='white'] { --bg: #ffffff; --bg2: #f8f9fa; --fg: #202124; --muted: #5f6368; --accent: #1a73e8; --border: rgba(0,0,0,.1); }
 
-/* --- الإعدادات الأساسية --- */
 *{box-sizing:border-box;min-width:0}
 html,body{margin:0;padding:0;overflow-x:hidden}
 body{
@@ -42,7 +35,7 @@ body{
   background:var(--bg);
   color:var(--fg);
   padding-top:70px !important;
-  padding-bottom:70px !important;
+  padding-bottom:10px !important;
 }
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;opacity:.04;
@@ -53,7 +46,6 @@ body::before{
 a{color:inherit; text-decoration:none;}
 img,svg,canvas{max-width:100%;height:auto}
 
-/* --- الشريط العلوي --- */
 header{
   position:fixed !important;top:0;left:0;right:0;z-index:100;
   background:var(--bg2);
@@ -66,7 +58,6 @@ header{
 .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.2rem}
 .brand img{width:32px;height:32px}
 
-/* أزرار الألوان الدائرية */
 .color-dot {
   width: 22px !important; height: 22px !important;
   border-radius: 50% !important;
@@ -76,7 +67,6 @@ header{
 }
 .color-dot:hover { border-color: var(--accent) !important; transform: scale(1.1); }
 
-/* --- المحتوى والبطاقات --- */
 main{max-width:1400px;margin:0 auto;padding:12px;display:grid;gap:12px}
 .card{
   background:var(--bg2);
@@ -117,7 +107,6 @@ main{max-width:1400px;margin:0 auto;padding:12px;display:grid;gap:12px}
 .pills button{border:1px solid var(--border);background:var(--bg2);color:var(--fg);border-radius:6px;padding:8px 12px;min-height:40px;font-family:'Amiri',serif;cursor:pointer}
 .pills button.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
 
-/* --- الأذكار والتسبيح --- */
 .pager-wrap{display:grid;gap:12px;max-width:780px;margin:0 auto}
 .pager-card{padding:20px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);}
 .dhikr-text,.pager-card .dhikr-text{font-size:1.4rem;line-height:2.2;margin:0;color:var(--accent)}
@@ -155,23 +144,22 @@ main{max-width:1400px;margin:0 auto;padding:12px;display:grid;gap:12px}
 .tasbeeh-secondary-row{display:flex;justify-content:center;margin-top:14px}
 .tasbeeh-reset-small{min-height:34px !important;padding:6px 16px !important;font-size:14px !important;border-radius:4px !important;min-width:84px}
 
-/* --- الشريط السفلي (تم إخفاؤه ليدمج بالصفحة) --- */
-.fixed-footer{
-  position:fixed !important;left:0;right:0;bottom:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:6px 14px;
-  background:var(--bg) !important; /* نفس لون الصفحة لعدم التمييز */
-  border-top:1px solid var(--border) !important; /* خط خفيف جداً */
-  backdrop-filter:none;
+.normal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 14px;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
 }
-.fixed-footer .footer-brand, .fixed-footer .footer-version{font-weight:normal;font-size:12px;color:var(--muted)}
+.normal-footer .footer-brand { font-weight: 900; }
+.normal-footer .footer-version { color: var(--muted); font-size: 14px; }
 
 #updateBar{position:fixed;left:50%;bottom:60px;transform:translateX(-50%);width:min(520px,calc(100% - 24px));display:none;gap:10px;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--accent);border-radius:6px;padding:10px 12px;z-index:9999}
 #updateBar .msg{font-size:15px;font-weight:700}
 
-/* --- إصلاحات الجوال --- */
 @media (max-width:768px){
-  /* إصلاح مشكلة تمدد الأزرار التي ظهرت في الصورة */
   .header-wrap{flex-direction:row;justify-content:space-between;align-items:center;padding:10px 12px;}
   .toolbar{width:auto;display:flex;flex-direction:row;gap:8px;}
   .toolbar select,.toolbar button{width:auto;} 
