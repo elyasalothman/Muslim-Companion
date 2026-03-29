@@ -1,5 +1,5 @@
-// رفيق المسلم – نسخة موسعة (0.1)
-// Build: 20260329-041345
+// رفيق المسلم – v0.1 (تحسين الأداء والواجهة)
+// Build: 20260329-072118
 
 const API_BASE='https://api.aladhan.com/v1';
 const KAABA={lat:21.4225,lon:39.8262};
@@ -9,6 +9,8 @@ const qs=(s,r=document)=>r.querySelector(s);
 const qsa=(s,r=document)=>Array.from(r.querySelectorAll(s));
 const LS=(k,v)=> (v===undefined?localStorage.getItem(k):localStorage.setItem(k,v));
 let CFG=null;
+
+let loaded = { adhkar:false, resources:false, learning:false, tools:false };
 
 function dayKey(){return new Date().toDateString();}
 function toRad(x){return x*Math.PI/180;}
@@ -27,13 +29,18 @@ function dateToApi(d){const dd=String(d.getDate()).padStart(2,'0');const mm=Stri
 async function fetchTimingsByCoords(date,lat,lon){
   const ds=dateToApi(date);
   const url=`${API_BASE}/timings/${ds}?latitude=${lat}&longitude=${lon}&method=${CFG.calculation.method}&school=${CFG.calculation.school}&iso8601=true`;
-  const r=await fetch(url); const j=await r.json(); if(j.code!==200) throw new Error('API');
+  const r=await fetch(url);
+  const j=await r.json();
+  if(j.code!==200) throw new Error('API');
   return j.data;
 }
+
 async function fetchTimingsByCity(date,city,country){
   const ds=dateToApi(date);
   const url=`${API_BASE}/timingsByCity/${ds}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${CFG.calculation.method}&school=${CFG.calculation.school}&iso8601=true`;
-  const r=await fetch(url); const j=await r.json(); if(j.code!==200) throw new Error('API');
+  const r=await fetch(url);
+  const j=await r.json();
+  if(j.code!==200) throw new Error('API');
   return j.data;
 }
 
@@ -42,6 +49,7 @@ function computeDuha(sunriseISO,dhuhrISO){
   const end=new Date(isoToDate(dhuhrISO).getTime()-CFG.duha.endOffsetBeforeDhuhrMin*60000);
   return {start,end};
 }
+
 function computeLastThird(maghribISO,fajrNextISO){
   const magh=isoToDate(maghribISO); const fajr=isoToDate(fajrNextISO);
   let night=fajr-magh; if(night<=0) night+=24*3600*1000;
@@ -67,7 +75,23 @@ function renderHijri(){
 function setTheme(t){document.documentElement.setAttribute('data-theme',t); LS('theme',t);}
 function initTheme(){const saved=LS('theme')||'dark'; setTheme(saved); qs('#toggleTheme').addEventListener('click',()=>setTheme((document.documentElement.getAttribute('data-theme')==='dark')?'light':'dark'));}
 
-function initNav(){qsa('.nav button').forEach(btn=>btn.addEventListener('click',()=>{qsa('.nav button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); qsa('.section').forEach(s=>s.classList.remove('active')); qs('#'+btn.dataset.target).classList.add('active'); window.scrollTo({top:0, behavior:'smooth'}); }));}
+function showSection(id){
+  qsa('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.target===id));
+  qsa('.section').forEach(s=>s.classList.toggle('active', s.id===id));
+}
+
+function initNav(){
+  qsa('.nav button').forEach(btn=>btn.addEventListener('click', async ()=>{
+    const id = btn.dataset.target;
+    showSection(id);
+    // lazy load heavy tabs
+    if(id==='adhkar' && !loaded.adhkar){ loaded.adhkar=true; await loadAdhkar(); }
+    if(id==='resources' && !loaded.resources){ loaded.resources=true; await loadResources(); }
+    if(id==='learning' && !loaded.learning){ loaded.learning=true; await loadLearning(); }
+    if(id==='tools' && !loaded.tools){ loaded.tools=true; setupTools(); }
+    window.scrollTo({top:0, behavior:'smooth'});
+  }));
+}
 
 function renderFooterVersion(){ setText('footerVersion', CFG.version); }
 
@@ -82,6 +106,7 @@ function initCityList(){
   sel.addEventListener('change',()=>{LS('cityFallback',sel.value); updateCityKPIFromSelect();});
   updateCityKPIFromSelect();
 }
+
 function getCityFallback(){const v=LS('cityFallback'); if(v){try{return JSON.parse(v);}catch(e){}} return {...CFG.defaultCity, label:'الرياض'};}
 
 function updateCityKPI(text){ setText('cityDisplay', text || '—'); }
@@ -95,8 +120,19 @@ function updateCityKPIFromSelect(){
   }
 }
 
+function setLocationMode(active){
+  const wrap = qs('#cityControls');
+  const chip = qs('#locChip');
+  if(active){
+    if(wrap) wrap.style.display='none';
+    if(chip){ chip.style.display='inline-flex'; chip.textContent='الموقع مفعل ✓'; }
+  } else {
+    if(wrap) wrap.style.display='flex';
+    if(chip) chip.style.display='none';
+  }
+}
+
 async function reverseGeocodeCity(lat, lon){
-  // Cache by rounding to 3 decimals (~100m)
   const key = `rg:${lat.toFixed(3)},${lon.toFixed(3)}`;
   const cached = LS(key);
   if(cached){ try{ return JSON.parse(cached);}catch(e){} }
@@ -104,10 +140,8 @@ async function reverseGeocodeCity(lat, lon){
   const r = await fetch(url);
   const j = await r.json();
   const out = {
-    city: j.city || j.locality || j.principalSubdivision || j.localityInfo?.administrative?.[0]?.name || null,
-    country: j.countryName || null,
-    subdivision: j.principalSubdivision || null,
-    source: j.lookupSource || null
+    city: j.city || j.locality || j.principalSubdivision || null,
+    country: j.countryName || null
   };
   LS(key, JSON.stringify(out));
   return out;
@@ -136,33 +170,39 @@ async function loadPrayerTimes(forceCity=false){
   try{
     let td, td2;
     if(!forceCity && 'geolocation' in navigator){
+      setLocationMode(true);
+      updateCityKPI('جاري تحديد المدينة…');
       const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:12000,maximumAge:600000}));
       const lat=pos.coords.latitude, lon=pos.coords.longitude;
       setText('ptMeta',`دقة الموقع: ±${Math.round(pos.coords.accuracy||0)}م`);
 
-      // Update city name from reverse geocoding
-      try{
-        const rg = await reverseGeocodeCity(lat, lon);
-        if(rg.city){ updateCityKPI(rg.city); }
-        else { updateCityKPI('موقعي'); }
-      } catch(e){ updateCityKPI('موقعي'); }
+      // Run reverse geocode in background (not blocking timings)
+      const rgPromise = reverseGeocodeCity(lat, lon).catch(()=>null);
 
-      td=await fetchTimingsByCoords(today,lat,lon);
-      td2=await fetchTimingsByCoords(tomorrow,lat,lon);
+      td = await fetchTimingsByCoords(today,lat,lon);
+      td2= await fetchTimingsByCoords(tomorrow,lat,lon);
       await updateQiblaFromCoords(lat,lon);
+
+      const rg = await rgPromise;
+      if(rg && rg.city) updateCityKPI(rg.city);
+      else updateCityKPI('موقعي');
+
     } else {
+      setLocationMode(false);
       updateCityKPI(c.label || c.city);
-      setText('ptMeta',`مدينة مختارة: ${c.city}`);
       td=await fetchTimingsByCity(today,c.city,c.country);
       td2=await fetchTimingsByCity(tomorrow,c.city,c.country);
     }
+
     const T=td.timings, TT=td2.timings;
     ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'].forEach(k=>setText('t_'+k.toLowerCase(), formatTime12h(isoToDate(T[k]))));
     const duha=computeDuha(T.Sunrise,T.Dhuhr); setText('t_duha',`${formatTime12h(duha.start)} – ${formatTime12h(duha.end)}`);
     const last=computeLastThird(T.Maghrib,TT.Fajr); setText('t_lastthird',`${formatTime12h(last.start)} – ${formatTime12h(last.end)}`);
     renderNextPrayer(T,TT.Fajr);
+
   }catch(e){
     console.warn(e);
+    setLocationMode(false);
     setText('ptStatus','تعذّر تحديد الموقع/جلب المواقيت. جرّب اختيار مدينة.');
   }
 }
@@ -172,6 +212,7 @@ async function updateQiblaFromCoords(lat,lon){
   setText('qiblaDeg',`${b.toFixed(1)}°`);
   LS('qiblaBearing', String(b));
 }
+
 function loadStoredQibla(){const v=LS('qiblaBearing'); if(v) setText('qiblaDeg',`${parseFloat(v).toFixed(1)}°`);}
 
 let headingEMA=null;
@@ -226,15 +267,15 @@ function renderDhikrList(container, list, keyPrefix){
 
 async function loadAdhkar(){
   const data=await (await fetch('./data/adhkar.json')).json();
-  const tabs = [
+  const tabs=[
     {key:'morning', label:'الصباح'},
     {key:'evening', label:'المساء'},
     {key:'sleep', label:'النوم'},
     {key:'afterPrayer', label:'بعد الصلاة'},
     {key:'daily', label:'متفرقة'}
   ];
-  const pills = qs('#adhkarPills');
-  const container = qs('#adhkarContainer');
+  const pills=qs('#adhkarPills');
+  const container=qs('#adhkarContainer');
   function activate(key){
     qsa('#adhkarPills button').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
     renderDhikrList(container, data[key], key);
@@ -259,7 +300,7 @@ function setupTasbeeh(){
 
 async function loadResources(){
   const data=await (await fetch('./data/resources.json')).json();
-  const host = qs('#usefulLinks');
+  const host=qs('#usefulLinks');
   host.innerHTML='';
   (data.useful||[]).forEach(g=>{
     const sec=document.createElement('div');
@@ -298,9 +339,7 @@ function setupTools(){
   nisab.addEventListener('input',calc); amount.addEventListener('input',calc);
 }
 
-function registerSW(){
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js',{scope:'./'}).catch(()=>{});
-}
+function registerSW(){ if('serviceWorker' in navigator) navigator.serviceWorker.register('./service-worker.js',{scope:'./'}).catch(()=>{}); }
 
 async function init(){
   CFG=await (await fetch('./assets/js/config.json')).json();
@@ -311,16 +350,13 @@ async function init(){
   renderFooterVersion();
   loadStoredQibla();
   setupCompass();
+  setupTasbeeh();
 
   qs('#useLocation').addEventListener('click', ()=> loadPrayerTimes(false));
   qs('#useCity').addEventListener('click', ()=> loadPrayerTimes(true));
 
+  // initial: fast load timings only
   await loadPrayerTimes(false);
-  await loadAdhkar();
-  setupTasbeeh();
-  await loadResources();
-  await loadLearning();
-  setupTools();
   registerSW();
 }
 

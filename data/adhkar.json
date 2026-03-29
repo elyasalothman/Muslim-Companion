@@ -1,6 +1,6 @@
 {
   "meta": {
-    "note": "أذكار مختارة صحيحة أو حسنة، مع روابط للمصادر للمراجعة.",
+    "note": "أذكار مختارة صحيحة/حسنة مع روابط للمصادر.",
     "sources": [
       {
         "title": "أذكار الصباح والمساء (IslamQA 217496)",
@@ -13,10 +13,6 @@
       {
         "title": "ذكر: بسم الله الذي لا يضر (IslamQA 126587)",
         "url": "https://islamqa.info/ar/answers/126587"
-      },
-      {
-        "title": "ما الصحيح من الأذكار في الصباح والمساء (ابن باز)",
-        "url": "https://binbaz.org.sa/fatwas/23415"
       }
     ]
   },
@@ -28,34 +24,22 @@
       "ref": "https://islamqa.info/ar/answers/217496"
     },
     {
-      "text": "أصبحنا وأصبح الملك لله... أسألك خير ما في هذا اليوم...",
+      "text": "أصبحنا وأصبح الملك لله...",
       "repeat": 1,
       "source": "مسلم",
       "ref": "https://islamqa.info/ar/answers/217496"
     },
     {
-      "text": "اللهم بك أصبحنا وبك أمسينا وبك نحيا وبك نموت وإليك النشور",
-      "repeat": 1,
-      "source": "السنن",
-      "ref": "https://islamqa.info/ar/answers/217496"
-    },
-    {
       "text": "سبحان الله وبحمده",
       "repeat": 100,
-      "source": "مسلم/البخاري",
+      "source": "صحيح",
       "ref": "https://dorar.net/hadith/sharh/40346"
     },
     {
-      "text": "بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم",
+      "text": "بسم الله الذي لا يضر...",
       "repeat": 3,
-      "source": "أبو داود/الترمذي",
+      "source": "صحيح/حسن",
       "ref": "https://islamqa.info/ar/answers/126587"
-    },
-    {
-      "text": "رضيت بالله ربًا وبالإسلام دينًا وبمحمد ﷺ نبيًا",
-      "repeat": 3,
-      "source": "السنن",
-      "ref": "https://islamqa.info/ar/answers/217496"
     },
     {
       "text": "الإخلاص والفلق والناس",
@@ -66,21 +50,15 @@
   ],
   "evening": [
     {
-      "text": "أمسينا وأمسى الملك لله... أسألك خير ما في هذه الليلة...",
+      "text": "أمسينا وأمسى الملك لله...",
       "repeat": 1,
       "source": "مسلم",
-      "ref": "https://islamqa.info/ar/answers/217496"
-    },
-    {
-      "text": "اللهم بك أمسينا وبك أصبحنا وبك نحيا وبك نموت وإليك المصير",
-      "repeat": 1,
-      "source": "السنن",
       "ref": "https://islamqa.info/ar/answers/217496"
     },
     {
       "text": "سبحان الله وبحمده",
       "repeat": 100,
-      "source": "مسلم",
+      "source": "صحيح",
       "ref": "https://islamqa.info/ar/answers/217496"
     },
     {
@@ -88,12 +66,6 @@
       "repeat": 3,
       "source": "مسلم",
       "ref": "https://islamqa.info/ar/answers/217496"
-    },
-    {
-      "text": "بسم الله الذي لا يضر...",
-      "repeat": 3,
-      "source": "أبو داود/الترمذي",
-      "ref": "https://islamqa.info/ar/answers/126587"
     },
     {
       "text": "الإخلاص والفلق والناس",
@@ -104,7 +76,7 @@
   ],
   "sleep": [
     {
-      "text": "جمع الكفين والنفث وقراءة الإخلاص والمعوذتين ثم مسح الجسد",
+      "text": "النفث بالمعوذات ومسح الجسد",
       "repeat": 3,
       "source": "البخاري",
       "ref": "https://islamqa.info/ar/answers/145543"
@@ -116,21 +88,15 @@
       "ref": "https://dorar.net/hadith/sharh/141083"
     },
     {
-      "text": "آخر آيتين من سورة البقرة (285–286)",
+      "text": "آخر آيتين من سورة البقرة",
       "repeat": 1,
-      "source": "البخاري/مسلم",
-      "ref": "https://islamqa.info/ar/answers/145543"
-    },
-    {
-      "text": "باسمك اللهم أموت وأحيا",
-      "repeat": 1,
-      "source": "البخاري",
+      "source": "صحيح",
       "ref": "https://islamqa.info/ar/answers/145543"
     },
     {
       "text": "تسبيح فاطمة (33/33/34)",
       "repeat": 1,
-      "source": "الصحيحين",
+      "source": "صحيح",
       "ref": "https://islamqa.info/ar/answers/145543"
     }
   ],
@@ -139,38 +105,14 @@
       "text": "أستغفر الله (ثلاثًا) ثم: اللهم أنت السلام ومنك السلام...",
       "repeat": 1,
       "source": "مسلم",
-      "ref": "https://islamweb.net/ar/fatwa/4514/%D8%A3%D8%B0%D9%83%D8%A7%D8%B1-%D8%A7%D9%84%D9%86%D9%88%D9%85"
-    },
-    {
-      "text": "سبحان الله 33، الحمد لله 33، الله أكبر 33، ثم تمام المئة: لا إله إلا الله وحده لا شريك له...",
-      "repeat": 1,
-      "source": "ثابت",
-      "ref": "https://binbaz.org.sa/fatwas/23415/%D9%85%D8%A7-%D8%A7%D9%84%D8%B5%D8%AD%D9%8A%D8%AD-%D9%85%D9%86-%D8%A7%D9%84%D8%A7%D8%B0%D9%83%D8%A7%D8%B1-%D9%81%D9%8A-%D8%A7%D9%84%D8%B5%D8%A8%D8%A7%D8%AD-%D9%88%D8%A7%D9%84%D9%85%D8%B3%D8%A7%D8%A1"
+      "ref": "https://islamqa.info/ar/answers/217496"
     }
   ],
   "daily": [
     {
-      "text": "عند الخروج: بسم الله، توكلت على الله، ولا حول ولا قوة إلا بالله",
-      "repeat": 1,
-      "source": "حصن المسلم/السنن",
-      "ref": "https://islamqa.info/ar/answers/217496"
-    },
-    {
-      "text": "عند دخول المنزل: بسم الله ولجنا وبسم الله خرجنا وعلى ربنا توكلنا",
+      "text": "عند الخروج: بسم الله، توكلت على الله...",
       "repeat": 1,
       "source": "ثابت",
-      "ref": "https://islamqa.info/ar/answers/217496"
-    },
-    {
-      "text": "عند دخول المسجد: اللهم افتح لي أبواب رحمتك",
-      "repeat": 1,
-      "source": "صحيح",
-      "ref": "https://islamqa.info/ar/answers/217496"
-    },
-    {
-      "text": "عند الخروج من المسجد: اللهم إني أسألك من فضلك",
-      "repeat": 1,
-      "source": "صحيح",
       "ref": "https://islamqa.info/ar/answers/217496"
     }
   ]

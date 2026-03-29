@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="theme-color" content="#081423"/>
+  <meta name="theme-color" content="#07111f"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <link rel="icon" href="./assets/img/icon-192.png"/>
   <link rel="stylesheet" href="./assets/css/styles.css"/>
@@ -12,7 +12,7 @@
 <body>
 <header>
   <div class="header-wrap">
-    <div class="brand"><img src="./assets/img/icon-192.png" alt=""/><span>رفيق المسلم</span></div>
+    <div class="brand"><img src="./assets/img/logo.svg" alt=""/><span>رفيق المسلم</span></div>
     <div class="toolbar"><button id="toggleTheme" title="الوضع الليلي/النهاري">☯</button></div>
   </div>
 </header>
@@ -44,14 +44,16 @@
     <section id="times" class="section active">
       <div class="row">
         <button class="btn" id="useLocation">تحديد موقعي</button>
-        <select id="citySelect"><option value="">— اختر مدينة —</option></select>
-        <button class="btn secondary" id="useCity">استخدام المدينة</button>
+        <span class="badge" id="locChip" style="display:none">الموقع مفعل ✓</span>
+        <div id="cityControls" class="row" style="margin:0">
+          <select id="citySelect"><option value="">— اختر مدينة —</option></select>
+          <button class="btn secondary" id="useCity">استخدام المدينة</button>
+        </div>
       </div>
       <div class="small notice" id="ptStatus"></div>
 
       <div class="row" style="margin-top:10px">
         <span class="badge">طريقة الحساب: أم القرى</span>
-        <span class="badge">العصر: حنبلي (ظل مثله)</span>
         <span class="badge">الوقت: 12 ساعة</span>
       </div>
 
@@ -103,7 +105,7 @@
       <p class="small">أدخل النصاب (مثلاً قيمة 85 جرام ذهب) ومبلغ أموالك الزكوية.</p>
       <div class="row"><input id="nisab" type="number" inputmode="decimal" placeholder="النصاب"/><input id="amount" type="number" inputmode="decimal" placeholder="مبلغ الأموال"/></div>
       <div class="kpi" style="margin-top:10px"><div class="label">النتيجة</div><div class="value" id="zakatOut">—</div></div>
-      <p class="small">* هذه حاسبة مبسطة (2.5%) للمبالغ الزكوية عند بلوغ النصاب.</p>
+      <p class="small">* حاسبة مبسطة (2.5%).</p>
     </section>
 
     <section id="resources" class="section">
@@ -111,9 +113,8 @@
     </section>
 
     <section id="about" class="section">
-      <p>نسخة موسعة محسّنة للجوال، مع عرض اسم المدينة عند استخدام الموقع، وروابط مفيدة، وأذكار موثوقة.</p>
-      <ul><li>الإصدار: 0.1</li><li>المواقيت: أم القرى + العصر حنبلي (ظل مثله)</li><li>PWA: يعمل دون اتصال بعد أول زيارة</li></ul>
-      <p class="small">ملاحظة: تحديد الموقع يحتاج إذن من المتصفح (HTTPS).</p>
+      <p>تم تحسين الأداء بإخفاء تحميل الأقسام الثقيلة حتى تفتحها (الأذكار/الروابط/التعلّم) + تحسين الواجهة.</p>
+      <ul><li>الإصدار: 0.1</li></ul>
     </section>
 
   </div>
