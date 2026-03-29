@@ -1,14 +1,13 @@
-const CACHE_NAME = 'rafiq-cache-v0.2.3';
+const CACHE_NAME = 'rafiq-cache-v0.2.4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './assets/css/styles.css',
-  './assets/js/app.js',
+  './assets/css/styles.css?v=0.2.4',
+  './assets/js/app.js?v=0.2.4',
   './assets/js/config.json'
 ];
 
 self.addEventListener('install', (event) => {
-  // إجبار المتصفح على تثبيت التحديث فوراً دون انتظار
   self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -22,7 +21,6 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          // مسح أي نسخة قديمة غير النسخة الحالية 0.2.3
           if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
