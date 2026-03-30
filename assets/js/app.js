@@ -160,7 +160,7 @@ async function loadPrayerTimes(forceCity = false) {
             const p3 = fetchWithCache(`${API_BASE}/timings/${dateToApi(today)}?latitude=${lat}&longitude=${lon}&method=3&school=${CFG.calculation.school}&iso8601=true`, `pt_coords_true`);
             
             const [td, td2, tdTrue] = await Promise.all([p1, p2, p3]);
-            setText('cityDisplay', 'cityName'); LS('qiblaBearing', String(bearing(lat, lon, KAABA.lat, KAABA.lon))); loadStoredQibla();
+            setText('cityDisplay', cityName); LS('qiblaBearing', String(bearing(lat, lon, KAABA.lat, KAABA.lon))); loadStoredQibla();
             renderTimes(td.timings, td2.timings, tdTrue.timings);
             qs('#locationControls').style.display = pos.coords.accuracy > 500 ? 'flex' : 'none';
         } else {
