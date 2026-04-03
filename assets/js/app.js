@@ -151,27 +151,50 @@ async function loadPrayerTimes(forceCity=false){
   }
 }
 
-function setupCompass(){const needle=qs('#needle'), acc=qs('#compassAccuracy'); if(!needle) return; let ema=null; function delta(a,b){return (b-a+540)%360-180} function render(q,h){needle.style.transform=`translate(-50%,-100%) rotate(${normalize360(q-h)}deg)`;} function onOri(ev){
-  let heading=null; 
-  if(typeof ev.webkitCompassHeading==='number'&&ev.webkitCompassHeading>=0){
-    heading=ev.webkitCompassHeading; 
-    if(typeof ev.webkitCompassAccuracy==='number') {
-      if(ev.webkitCompassAccuracy > 30) { // إذا كانت الدقة سيئة
-        acc.textContent = 'يرجى تحريك الهاتف على شكل رقم 8 لمعايرة البوصلة 🔄';
-        acc.style.color = 'var(--danger)';
-      } else {
-        acc.textContent = ''; // إخفاء النص إذا كانت دقيقة
+function setupCompass(){
+  const needle=qs('#needle'), acc=qs('#compassAccuracy'); if(!needle) return; 
+  let ema=null; function delta(a,b){return (b-a+540)%360-180} 
+  function render(q,h){needle.style.transform=`translate(-50%,-100%) rotate(${normalize360(q-h)}deg)`;} 
+  
+  function onOri(ev){
+    let heading=null; 
+    if(typeof ev.webkitCompassHeading==='number'&&ev.webkitCompassHeading>=0){
+      heading=ev.webkitCompassHeading; 
+      if(typeof ev.webkitCompassAccuracy==='number') {
+        if(ev.webkitCompassAccuracy > 30) { 
+          acc.textContent = 'يرجى تحريك الهاتف على شكل رقم 8 لمعايرة البوصلة 🔄';
+          acc.style.color = 'var(--danger)';
+        } else {
+          acc.textContent = ''; 
+        }
       }
-    }
-  } else if(typeof ev.alpha==='number'){
-    heading=360-ev.alpha; 
-    acc.textContent = ''; // تم حذف كلمة "تقريبية"
-  } 
-  if(heading==null) return; 
-  const q=parseFloat(LS('qiblaBearing')||'0')||0; 
-  if(ema==null) ema=heading; 
-  ema=normalize360(ema+delta(ema,heading)*0.18); 
-  render(q,ema);
+    } else if(typeof ev.alpha==='number'){
+      heading=360-ev.alpha; 
+      acc.textContent = ''; 
+    } 
+    if(heading==null) return; 
+    const q=parseFloat(LS('qiblaBearing')||'0')||0; 
+    if(ema==null) ema=heading; 
+    ema=normalize360(ema+delta(ema,heading)*0.18); 
+    render(q,ema);
+  }
+
+  const btn=qs('#enableCompass');
+  if(btn){
+    btn.addEventListener('click', async ()=>{
+      if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+        try {
+          const p = await DeviceOrientationEvent.requestPermission();
+          if(p==='granted'){ window.addEventListener('deviceorientation',onOri,true); btn.style.display='none'; }
+          else { acc.textContent='تم رفض الصلاحية'; }
+        } catch(e){ acc.textContent='خطأ في الصلاحية'; }
+      } else {
+        window.addEventListener('deviceorientationabsolute',onOri,true);
+        window.addEventListener('deviceorientation',onOri,true);
+        btn.style.display='none';
+      }
+    });
+  }
 }
 function haptic(ms=10){try{if(navigator.vibrate) navigator.vibrate(ms);}catch(e){}}
 function setupTasbeeh(){const select=qs('#tasbeehPhraseSelect'), current=qs('#currentTasbeeh'), countEl=qs('#tasbeehCount'), targetEl=qs('#tasbeehTarget'), btn=qs('#tasbeehBtn'), resetBtn=qs('#tasbeehReset'), nextBtn=qs('#tasbeehNext'); if(!select||!current||!countEl||!targetEl||!btn||!resetBtn||!nextBtn) return; select.innerHTML=''; TASBEEH_PHRASES.forEach((p,idx)=>{const o=document.createElement('option'); o.value=String(idx); o.textContent=`${p.name} — ${p.target}`; select.appendChild(o);}); let phraseIndex=parseInt(LS('tasbeehPhraseIndex')||'0',10); if(Number.isNaN(phraseIndex)||phraseIndex<0||phraseIndex>=TASBEEH_PHRASES.length) phraseIndex=0; let count=parseInt(LS('tasbeehCount')||'0',10); if(Number.isNaN(count)||count<0) count=0; function render(){const p=TASBEEH_PHRASES[phraseIndex]; select.value=String(phraseIndex); current.textContent=p.name; countEl.textContent=String(count); targetEl.textContent=`الهدف: ${p.target}`;} function save(){LS('tasbeehPhraseIndex',String(phraseIndex)); LS('tasbeehCount',String(count));} select.addEventListener('change',()=>{phraseIndex=parseInt(select.value,10)||0; count=0; save(); render(); haptic(10);}); const increment=()=>{const p=TASBEEH_PHRASES[phraseIndex]; count+=1; save(); render(); if(count===p.target) haptic([28,35,28]); else haptic(9);}; btn.addEventListener('click',increment); btn.addEventListener('touchstart',()=>haptic(7),{passive:true}); resetBtn.addEventListener('click',()=>{count=0; save(); render(); haptic(15);}); nextBtn.addEventListener('click',()=>{phraseIndex=(phraseIndex+1)%TASBEEH_PHRASES.length; count=0; save(); render(); haptic([15,18,15]);}); render();}
@@ -186,6 +209,7 @@ function updateGlobalProgress(list, keyPrefix) {
 
 function renderPager(container,list,keyPrefix){
   if(!list) return; updateGlobalProgress(list, keyPrefix);
+  let index=parseInt(LS(`pager:${keyPrefix}:index`)||'0',10); if(Number.isNaN(index)||index<0||index>=list.length) index=0;
   // منطق العودة للبداية بعد 6 ساعات
   const lastSavedTime = parseInt(LS(`pager:${keyPrefix}:time`)||'0',10);
   if(Date.now() - lastSavedTime > 6 * 3600 * 1000) { index = 0; }
