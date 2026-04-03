@@ -1,4 +1,5 @@
 // Rafiq Muslim v0.6.2 - Scrolling re-enabled & Layout fix
+let loaded={adhkar:false, resources:false, learning:false, quran:false};
 const API_BASE='https://api.aladhan.com/v1';
 const KAABA={lat:21.4225,lon:39.8262};
 const BDC_REVERSE='https://api-bdc.net/data/reverse-geocode-client';
@@ -71,6 +72,7 @@ function showSection(id){qsa('.bottom-nav button').forEach(b=>b.classList.toggle
 function initNav(){
   qsa('.bottom-nav button').forEach(btn=>btn.addEventListener('click',async()=>{
     const id=btn.dataset.target; showSection(id); 
+    if(id==='quran'&&!loaded.quran){loaded.quran=true; loadSurahList();}
     if(id==='adhkar'&&!loaded.adhkar){loaded.adhkar=true; await loadAdhkar();} 
     if(id==='learning'&&!loaded.learning){loaded.learning=true; await Promise.all([loadLearning(), loadResources(), loadDailyBenefit()]);} 
     window.scrollTo({top:0,behavior:'smooth'});
@@ -220,7 +222,64 @@ async function loadResources(){const data = await fetchJSON('./data/resources.js
 async function loadLearning(){const data = await fetchJSON('./data/learning.json', {plan:[], collections:[], reminders:[]}); const plan=qs('#learnPlan'), col=qs('#learnCollections'), rem=qs('#learnReminders'); if(plan){plan.innerHTML=''; (data.plan||[]).forEach(it=>{const d=document.createElement('div'); d.className='pager-card'; d.innerHTML=`<b style="font-size:1.4rem; color:var(--accent); display:block; margin-bottom:8px;">${it.title}</b><div style="font-size:1.3rem; line-height:1.8;">${it.tip}</div>`; plan.appendChild(d);});} if(col){col.innerHTML=''; (data.collections||[]).forEach(it=>{const li=document.createElement('li'); li.innerHTML=`<a href="${it.url}" target="_blank" rel="noopener">${it.title}</a>`; col.appendChild(li);});} if(rem){rem.innerHTML=''; (data.reminders||[]).forEach(t=>{const li=document.createElement('li'); li.textContent=t; rem.appendChild(li);});}}
 function showUpdateBar(reg){const bar=qs('#updateBar'); if(!bar) return; bar.style.display='flex'; qs('#updateNow')?.addEventListener('click',()=>{if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});},{once:true}); qs('#updateLater')?.addEventListener('click',()=>{bar.style.display='none';},{once:true});}
 async function registerSW(){if(!('serviceWorker' in navigator)) return; const reg=await navigator.serviceWorker.register('./service-worker.js',{scope:'./'}); try{await reg.update();}catch(e){} navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload(),{once:true}); if(reg.waiting) showUpdateBar(reg); reg.addEventListener('updatefound',()=>{const sw=reg.installing; if(!sw) return; sw.addEventListener('statechange',()=>{if(sw.state==='installed'&&navigator.serviceWorker.controller) showUpdateBar(reg);});});}
+async function loadSurahList() {
+  try {
+    const res = await fetch('https://api.alquran.cloud/v1/surah');
+    const data = await res.json();
+    const container = qs('#surahList');
+    container.innerHTML = '';
+    data.data.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'surah-card';
+      el.innerHTML = `<div class="surah-name">${s.name}</div><div class="surah-meta">آياتها: ${s.numberOfAyahs} | ${s.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</div>`;
+      el.addEventListener('click', () => openSurah(s.number, s.name));
+      container.appendChild(el);
+    });
+  } catch (e) {
+    qs('#surahList').innerHTML = '<div style="text-align:center; grid-column: 1 / -1;">حدث خطأ في تحميل السور. تأكد من الاتصال بالإنترنت.</div>';
+  }
+}
 
+async function openSurah(num, name) {
+  qs('#surahList').style.display = 'none';
+  const reader = qs('#quranReader');
+  reader.style.display = 'block';
+  qs('#surahTitle').textContent = 'جاري التحميل...';
+  qs('#quranText').innerHTML = '';
+  
+  try {
+    const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/quran-uthmani`);
+    const data = await res.json();
+    qs('#surahTitle').textContent = name;
+    
+    let html = '';
+    // إضافة البسملة للسور عدا الفاتحة والتوبة
+    if (num !== 1 && num !== 9) {
+      html += '<div style="text-align:center; font-size:1.8rem; margin-bottom:15px; color:var(--accent2);">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>';
+    }
+    
+    let ayahs = data.data.ayahs;
+    // معالجة تقنية: إزالة البسملة المدمجة في بداية الآية الأولى لبعض السور عبر الـ API
+    if(num !== 1 && num !== 9 && ayahs[0].text.startsWith('بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ')){
+        ayahs[0].text = ayahs[0].text.replace('بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ', '');
+    }
+
+    ayahs.forEach(a => {
+      html += `<span class="ayah-text">${a.text}</span><span class="ayah-number">${a.numberInSurah}</span>`;
+    });
+    
+    qs('#quranText').innerHTML = html;
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  } catch (e) {
+    qs('#quranText').innerHTML = '<div style="text-align:center;">حدث خطأ في تحميل الآيات.</div>';
+  }
+}
+
+qs('#backToSurahs')?.addEventListener('click', () => {
+  qs('#quranReader').style.display = 'none';
+  qs('#surahList').style.display = 'grid';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+});
 async function init(){
   const fallbackConfig = { calculation: { method: 4, school: 0 }, duha: { startOffsetAfterSunriseMin: 15, endOffsetBeforeDhuhrMin: 10 }, defaultCity: { label: 'مكة المكرمة', city: 'Makkah', country: 'SA' } };
   CFG = await fetchJSON('./assets/js/config.json', fallbackConfig); 
