@@ -1,9 +1,9 @@
-const CACHE_NAME = 'rafiq-cache-v0.6.3';
+const CACHE_NAME = 'rafiq-cache-v1.0.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './assets/css/styles.css?v=0.6.3',
-  './assets/js/app.js?v=0.6.3',
+  './assets/css/styles.css?v=1.0.0',
+  './assets/js/app.js?v=1.0.0',
   './assets/js/config.json',
   './data/benefits.json'
 ];

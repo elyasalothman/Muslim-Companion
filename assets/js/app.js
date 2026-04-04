@@ -1,4 +1,4 @@
-// Rafiq Muslim v0.6.3 - النسخة المحدثة
+// Rafiq Muslim v1.0.0 - النسخة الرسمية الأولى
 const API_BASE='https://api.aladhan.com/v1';
 const KAABA={lat:21.4225,lon:39.8262};
 const BDC_REVERSE='https://api-bdc.net/data/reverse-geocode-client';
@@ -105,7 +105,10 @@ async function showSection(id) {
 
   // 3. تحميل البيانات إذا لزم الأمر (خاص بالقرآن والأذكار والتعلم)
   if (id === 'quran' && !loaded.quran) { loaded.quran = true; loadSurahList(); }
-  if (id === 'adhkar' && !loaded.adhkar) { loaded.adhkar = true; await loadAdhkar(); }
+  if (id === 'adhkar' && !loaded.adhkar) { 
+    loaded.adhkar = true; 
+    await Promise.all([loadAdhkar(), loadDailyBenefit()]); 
+  }
   if (id === 'learning' && !loaded.learning) { 
     loaded.learning = true; 
     await Promise.all([loadLearning(), loadResources(), loadDailyBenefit()]); 
@@ -235,43 +238,68 @@ async function loadPrayerTimes(forceCity=false){
   }
 }
 
-function setupCompass(){
-  const needle=qs('#needle'), acc=qs('#compassAccuracy'); if(!needle) return; 
-  let ema=null; function delta(a,b){return (b-a+540)%360-180} 
-  function render(q,h){needle.style.transform=`translate(-50%,-100%) rotate(${normalize360(q-h)}deg)`;} 
-  function onOri(ev){
-    let heading=null; 
-    if(typeof ev.webkitCompassHeading==='number'&&ev.webkitCompassHeading>=0){
-      heading=ev.webkitCompassHeading; 
-      if(typeof ev.webkitCompassAccuracy==='number') {
-        if(ev.webkitCompassAccuracy > 30) { 
-          acc.textContent = 'يرجى تحريك الهاتف على شكل رقم 8 لمعايرة البوصلة 🔄';
-          acc.style.color = 'var(--danger)';
-        } else { acc.textContent = ''; }
-      }
-    } else if(typeof ev.alpha==='number'){
-      heading=360-ev.alpha; 
-      acc.textContent = ''; 
+function setupCompass() {
+  const needle = qs('#needle'), acc = qs('#compassAccuracy'); 
+  if (!needle) return; 
+
+  let lastHeading = null;
+
+  function render(q, h) {
+    // حساب الزاوية النهائية
+    const angle = normalize360(q - h);
+    // استخدام التدوير فقط لمنع حركة "فوق تحت"
+    needle.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+  } 
+
+  function onOri(ev) {
+    let heading = null; 
+
+    // للأيفون (Safari)
+    if (typeof ev.webkitCompassHeading === 'number' && ev.webkitCompassHeading >= 0) {
+      heading = ev.webkitCompassHeading; 
+      if (typeof ev.webkitCompassAccuracy === 'number' && ev.webkitCompassAccuracy > 30) {
+        acc.textContent = 'يرجى تحريك الهاتف على شكل 8 لمعايرة البوصلة 🔄';
+      } else { acc.textContent = ''; }
     } 
-    if(heading==null) return; 
-    const q=parseFloat(LS('qiblaBearing')||'0')||0; 
-    if(ema==null) ema=heading; 
-    ema=normalize360(ema+delta(ema,heading)*0.18); 
-    render(q,ema);
+    // للأندرويد والمتصفحات الداعمة لـ Absolute
+    else if (typeof ev.alpha === 'number') {
+      heading = (ev.absolute !== false) ? 360 - ev.alpha : null;
+    }
+
+    if (heading === null) return;
+
+    // الحصول على زاوية القبلة المخزنة
+    const qibla = parseFloat(LS('qiblaBearing') || '0') || 0;
+
+    // تنعيم الحركة لمنع القفز السريع
+    if (lastHeading === null) {
+      lastHeading = heading;
+    } else {
+      // دالة حساب أقصر مسافة للدوران لمنع الالتفاف الكامل (Shortest Path)
+      let diff = heading - lastHeading;
+      if (diff > 180) diff -= 360;
+      if (diff < -180) diff += 360;
+      lastHeading += diff * 0.2; // معامل التنعيم
+    }
+
+    render(qibla, lastHeading);
   }
-  const btn=qs('#enableCompass');
-  if(btn){
-    btn.addEventListener('click', async ()=>{
-      if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+
+  const btn = qs('#enableCompass');
+  if (btn) {
+    btn.addEventListener('click', async () => {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         try {
           const p = await DeviceOrientationEvent.requestPermission();
-          if(p==='granted'){ window.addEventListener('deviceorientation',onOri,true); btn.style.display='none'; }
-          else { acc.textContent='تم رفض الصلاحية'; }
-        } catch(e){ acc.textContent='خطأ في الصلاحية'; }
+          if (p === 'granted') {
+            window.addEventListener('deviceorientation', onOri, true);
+            btn.style.display = 'none';
+          } else { acc.textContent = 'تم رفض تصريح البوصلة'; }
+        } catch (e) { acc.textContent = 'خطأ في تفعيل الحساس'; }
       } else {
-        window.addEventListener('deviceorientationabsolute',onOri,true);
-        window.addEventListener('deviceorientation',onOri,true);
-        btn.style.display='none';
+        // للأندرويد والمتصفحات الأخرى
+        window.addEventListener('deviceorientationabsolute', onOri, true);
+        btn.style.display = 'none';
       }
     });
   }

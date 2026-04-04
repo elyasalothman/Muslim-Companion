@@ -1,6 +1,6 @@
 {
-  "version": "0.6.3",
-  "build": "20260403-110000",
+  "version": "1.0.0",
+  "build": "20260404-150000",
   "calculation": {
     "method": 4,
     "school": 0
