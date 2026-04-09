@@ -313,8 +313,86 @@ function setupCompass() {
 
 function haptic(ms=10){try{if(navigator.vibrate) navigator.vibrate(ms);}catch(e){}}
 
-function setupTasbeeh(){const select=qs('#tasbeehPhraseSelect'), current=qs('#currentTasbeeh'), countEl=qs('#tasbeehCount'), targetEl=qs('#tasbeehTarget'), btn=qs('#tasbeehBtn'), resetBtn=qs('#tasbeehReset'), nextBtn=qs('#tasbeehNext'); if(!select||!current||!countEl||!targetEl||!btn||!resetBtn||!nextBtn) return; select.innerHTML=''; TASBEEH_PHRASES.forEach((p,idx)=>{const o=document.createElement('option'); o.value=String(idx); o.textContent=`${p.name} — ${p.target}`; select.appendChild(o);}); let phraseIndex=parseInt(LS('tasbeehPhraseIndex')||'0',10); if(Number.isNaN(phraseIndex)||phraseIndex<0||phraseIndex>=TASBEEH_PHRASES.length) phraseIndex=0; let count=parseInt(LS('tasbeehCount')||'0',10); if(Number.isNaN(count)||count<0) count=0; function render(){const p=TASBEEH_PHRASES[phraseIndex]; select.value=String(phraseIndex); current.textContent=p.name; countEl.textContent=String(count); targetEl.textContent=`الهدف: ${p.target}`;} function save(){LS('tasbeehPhraseIndex',String(phraseIndex)); LS('tasbeehCount',String(count));} select.addEventListener('change',()=>{phraseIndex=parseInt(select.value,10)||0; count=0; save(); render(); haptic(10);}); const increment=()=>{const p=TASBEEH_PHRASES[phraseIndex]; count+=1; save(); render(); if(count===p.target) haptic([28,35,28]); else haptic(9);}; btn.addEventListener('click',increment); btn.addEventListener('touchstart',()=>haptic(7),{passive:true}); resetBtn.addEventListener('click',()=>{count=0; save(); render(); haptic(15);}); nextBtn.addEventListener('click',()=>{phraseIndex=(phraseIndex+1)%TASBEEH_PHRASES.length; count=0; save(); render(); haptic([15,18,15]);}); render();}
+function setupTasbeeh(){
+  const select=qs('#tasbeehPhraseSelect'), current=qs('#currentTasbeeh'), countEl=qs('#tasbeehCount'), targetEl=qs('#tasbeehTarget'), btn=qs('#tasbeehBtn'), resetBtn=qs('#tasbeehReset'), nextBtn=qs('#tasbeehNext'); 
+  if(!select||!current||!countEl||!targetEl||!btn||!resetBtn||!nextBtn) return; 
 
+  select.innerHTML=''; 
+  TASBEEH_PHRASES.forEach((p,idx)=>{const o=document.createElement('option'); o.value=String(idx); o.textContent=`${p.name} — ${p.target}`; select.appendChild(o);}); 
+
+  let phraseIndex=parseInt(LS('tasbeehPhraseIndex')||'0',10); 
+  let count=parseInt(LS('tasbeehCount')||'0',10); 
+  
+  // --- منطق التصفير التلقائي كل ساعتين ---
+  let lastReset = parseInt(LS('tasbeehLastReset') || '0', 10);
+  const TWO_HOURS = 2 * 60 * 60 * 1000; // ساعتان بالملي ثانية
+
+  const checkAutoReset = () => {
+    const now = Date.now();
+    if (lastReset === 0 || (now - lastReset) >= TWO_HOURS) {
+      count = 0;
+      lastReset = now;
+      LS('tasbeehLastReset', String(lastReset));
+      save();
+    }
+  };
+  // ---------------------------------------
+
+  function render(){
+    const p=TASBEEH_PHRASES[phraseIndex]; 
+    select.value=String(phraseIndex); 
+    current.textContent=p.name; 
+    countEl.textContent=String(count); 
+    targetEl.textContent=`الهدف: ${p.target}`;
+  } 
+
+  function save(){
+    LS('tasbeehPhraseIndex', String(phraseIndex)); 
+    LS('tasbeehCount', String(count));
+  } 
+
+  // تشغيل فحص التصفير عند البداية
+  checkAutoReset();
+
+  select.addEventListener('change',()=>{
+    phraseIndex=parseInt(select.value,10)||0; 
+    count=0; 
+    save(); 
+    render(); 
+    haptic(10);
+  }); 
+
+  const increment=()=>{
+    checkAutoReset(); // فحص الوقت عند كل ضغطة للتأكد
+    const p=TASBEEH_PHRASES[phraseIndex]; 
+    count+=1; 
+    save(); 
+    render(); 
+    if(count===p.target) haptic([28,35,28]); else haptic(9);
+  }; 
+
+  btn.addEventListener('click',increment); 
+  btn.addEventListener('touchstart',()=>haptic(7),{passive:true}); 
+
+  resetBtn.addEventListener('click',()=>{
+    count=0; 
+    lastReset = Date.now(); // تحديث وقت التصفير يدوياً أيضاً
+    LS('tasbeehLastReset', String(lastReset));
+    save(); 
+    render(); 
+    haptic(15);
+  }); 
+
+  nextBtn.addEventListener('click',()=>{
+    phraseIndex=(phraseIndex+1)%TASBEEH_PHRASES.length; 
+    count=0; 
+    save(); 
+    render(); 
+    haptic([15,18,15]);
+  }); 
+
+  render();
+}
 function dayKey(){return new Date().toDateString()}
 
 function updateGlobalProgress(list, keyPrefix) {
@@ -408,51 +486,120 @@ async function init(){
 }
 window.addEventListener('load',init);
 
-// تحميل قائمة السور
+let allSurahs = []; // لتخزين السور محلياً من أجل البحث السريع
+
+// 1. تحميل قائمة السور مع دعم البحث
 async function loadSurahList() {
+  const container = document.getElementById('surahList');
+  if (!container) return;
+
   try {
     const res = await fetch('https://api.alquran.cloud/v1/surah');
     const data = await res.json();
-    const container = document.getElementById('surahList');
-    if (!container) return;
-    container.innerHTML = '';
-    data.data.forEach(s => {
-      const el = document.createElement('div');
-      el.className = 'surah-card';
-      el.innerHTML = `<div class="surah-name">${s.name}</div><div class="surah-meta">آياتها: ${s.numberOfAyahs}</div>`;
-      el.addEventListener('click', () => openSurah(s.number, s.name));
-      container.appendChild(el);
-    });
+    allSurahs = data.data;
+    renderSurahs(allSurahs);
+    setupQuranSearch();
+    setupQuranTabs();
   } catch (e) {
-    if(document.getElementById('surahList')) document.getElementById('surahList').innerHTML = 'حدث خطأ في تحميل السور.';
+    container.innerHTML = '<div style="text-align:center; width:100%;">حدث خطأ في الاتصال. يرجى المحاولة لاحقاً.</div>';
   }
 }
 
-// تحديث دالة فتح السورة (حذف مرجع liveBroadcast)
-async function openSurah(num, name) {
-  const list = document.getElementById('surahList');
-  if(list) list.style.display = 'none';
+// 2. دالة عرض السور في الشبكة
+function renderSurahs(list) {
+  const container = document.getElementById('surahList');
+  container.innerHTML = '';
   
-  const reader = document.getElementById('quranReader');
-  if(reader) reader.style.display = 'block';
-  
-  setText('surahTitle', name);
-  try {
-    const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/quran-uthmani`);
-    const data = await res.json();
-    let html = '';
-    data.data.ayahs.forEach(a => { html += `<span class="ayah-text">${a.text}</span><span class="ayah-number">${a.numberInSurah}</span> `; });
-    const textEl = document.getElementById('quranText');
-    if(textEl) textEl.innerHTML = html;
-    window.scrollTo({top: 0, behavior: 'smooth'});
-  } catch (e) { setText('quranText', "خطأ في التحميل"); }
+  if (list.length === 0) {
+    container.innerHTML = '<div style="text-align:center; width:100%; padding: 20px;">لا توجد نتائج للبحث</div>';
+    return;
+  }
+
+  list.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'surah-card';
+    el.innerHTML = `
+      <div class="surah-info">
+        <div class="surah-name">${s.name}</div>
+        <div class="surah-meta">${s.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} • ${s.numberOfAyahs} آية</div>
+      </div>
+      <div class="surah-number" style="color: var(--muted); font-weight: bold;">${s.number}</div>
+    `;
+    el.addEventListener('click', () => openSurah(s.number, s.name));
+    container.appendChild(el);
+  });
 }
 
-// تحديث زر الرجوع في صفحة القرآن
-qs('#backToSurahs')?.addEventListener('click', () => {
-  qs('#quranReader').style.display = 'none';
-  qs('#surahList').style.display = 'grid';
-  window.scrollTo({top: 0, behavior: 'smooth'});
-});
+// 3. إعداد ميزة البحث
+function setupQuranSearch() {
+  const searchInput = document.getElementById('quranSearch');
+  searchInput?.addEventListener('input', (e) => {
+    const term = e.target.value.trim();
+    const filtered = allSurahs.filter(s => s.name.includes(term) || s.englishName.toLowerCase().includes(term.toLowerCase()));
+    renderSurahs(filtered);
+  });
+}
 
-// يمكنك حذف دالة toggleQuranView بالكامل لأنها لم تعد مطلوبة
+// 4. إعداد التبويب (سور / أجزاء)
+function setupQuranTabs() {
+  const tabs = document.querySelectorAll('#quranTabs button');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      if (tab.dataset.tab === 'juz') {
+        renderJuzList();
+      } else {
+        renderSurahs(allSurahs);
+      }
+    });
+  });
+}
+
+// 5. عرض قائمة الأجزاء (30 جزء)
+function renderJuzList() {
+  const container = document.getElementById('surahList');
+  container.innerHTML = '';
+  for (let i = 1; i <= 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'surah-card';
+    el.innerHTML = `<div class="surah-name">الجزء ${i}</div>`;
+    el.addEventListener('click', () => openJuz(i));
+    container.appendChild(el);
+  }
+}
+
+// 6. فتح الجزء
+async function openJuz(num) {
+  toggleQuranView(true);
+  setText('surahTitle', `الجزء ${num}`);
+  const textEl = document.getElementById('quranText');
+  textEl.innerHTML = 'جاري تحميل الجزء...';
+  
+  try {
+    const res = await fetch(`https://api.alquran.cloud/v1/juz/${num}/quran-uthmani`);
+    const data = await res.json();
+    renderAyahs(data.data.ayahs);
+  } catch (e) { textEl.innerHTML = "خطأ في تحميل بيانات الجزء."; }
+}
+
+// 7. دالة مساعدة لعرض الآيات مع أرقامها بتصميمك الجديد
+function renderAyahs(ayahs) {
+  let html = '';
+  ayahs.forEach(a => {
+    const text = showTashkeel ? a.text : a.text.replace(/[\u064B-\u065F\u0640]/g, '');
+    html += `<span class="ayah-text">${text}</span><span class="ayah-number">${a.numberInSurah}</span> `;
+  });
+  document.getElementById('quranText').innerHTML = html;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// 8. تحسين دالة تبديل العرض
+function toggleQuranView(isReading) {
+  document.getElementById('surahList').style.display = isReading ? 'none' : 'grid';
+  document.getElementById('quranReader').style.display = isReading ? 'block' : 'none';
+  document.querySelector('.quran-header').style.display = isReading ? 'none' : 'block';
+}
+
+// تحديث زر العودة
+document.getElementById('backToSurahs')?.addEventListener('click', () => toggleQuranView(false));

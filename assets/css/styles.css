@@ -299,13 +299,7 @@ main{
   padding: 10px 15px; border-bottom: 1px solid var(--border); background: var(--bg2);
 }
 /* تعديل منطقة نص القرآن (الخط واللون) */
-.quran-content-area {
-  flex: 1; overflow-y: auto; padding: 30px 20px;
-  font-size: 2.2rem; line-height: 2.8; text-align: justify; font-family: 'Amiri', serif;
-  /* استخدام اللون البني الخفيف (الذي عرفناه بـ --fg) للنص ليكون غير مبهر */
-  color: var(--fg) !important; 
-  background: var(--bg) !important;
-}
+
 .reader-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 20px; background: var(--bg2); border-top: 1px solid var(--border);
@@ -314,8 +308,21 @@ main{
 .reader-title { font-size: 1.4rem; font-weight: bold; color: var(--accent); }
 /* تنسيقات قسم القرآن الكريم والبث */
 .surah-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-.surah-card { background: var(--bg); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius); text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--card-shadow); }
-.surah-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.surah-card {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: var(--bg-card);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.surah-card:hover {
+    transform: scale(1.02);
+    border-right: 5px solid var(--primary);
+}
 .surah-name { font-size: 1.6rem; font-weight: bold; color: var(--accent); }
 .surah-meta { font-size: 1.1rem; color: var(--muted); margin-top: 5px; }
 
@@ -326,3 +333,21 @@ main{
 .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
 #quranTabs { margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.quran-text-container {
+    font-family: 'Amiri', serif; /* يفضل استخدام خط عثماني */
+    font-size: 1.5rem;
+    line-height: 2.5;
+    text-align: center;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: 15px;
+    direction: rtl;
+}
+
+.quran-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg-body);
+    z-index: 10;
+    padding: 10px 0;
+}

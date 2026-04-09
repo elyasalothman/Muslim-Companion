@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl" data-scheme="blue">
+<html lang="ar" dir="rtl" data-scheme="colorful">
 <head>
 <link rel="canonical" href="https://tahajjud.alhajda.com/" />
 <meta name="description" content="تهجد: تطبيق ويب إسلامي متكامل يضم مواقيت الصلاة الدقيقة، أذكار الصباح والمساء، ومصحفاً إلكترونياً للقراءة."/>
@@ -141,31 +141,53 @@
     </section>
 
   <section id="quran" class="section">
-  <h3 class="section-title">القرآن الكريم</h3>
-  
-  <div id="quranReader" style="display:none;">
-    <button id="backToSurahs" style="font-size: 2.5rem; background: none; border: none; color: var(--accent); cursor: pointer;">&rarr;</button>
-    <div id="surahTitle" style="text-align:center; font-size: 2rem; color: var(--accent); font-weight:bold; margin-bottom: 20px;"></div>
-    <div id="quranText" style="font-size: 2rem; line-height: 2.5; text-align: justify; font-family: 'Amiri', serif; padding: 10px;"></div>
+  <div class="quran-header">
+    <h3 class="section-title">القرآن الكريم</h3>
+    <input type="text" id="quranSearch" placeholder="🔍 ابحث عن اسم السورة..." 
+           style="width: 100%; margin-bottom: 15px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--fg);">
+    
+    <div id="quranTabs" class="pills" style="grid-template-columns: 1fr 1fr; margin-bottom: 15px;">
+      <button class="active" data-tab="surah">السور</button>
+      <button data-tab="juz">الأجزاء</button>
+    </div>
   </div>
 
   <div id="surahList" class="surah-grid">
-     <div style="text-align:center; width:100%; grid-column: 1 / -1;">جاري تحميل قائمة السور...</div>
+     <div style="text-align:center; width:100%; grid-column: 1 / -1;">جاري تحميل القائمة...</div>
+  </div>
+
+  <div id="quranReader" style="display:none;">
+    <div class="reading-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <button id="backToSurahs" class="btn secondary" style="font-size: 1.2rem;">← عودة</button>
+      <div id="surahTitle" style="font-size: 1.8rem; color: var(--accent); font-weight:bold;"></div>
+      <div style="width: 40px;"></div> </div>
+    
+    <div id="quranText" class="quran-text-container"></div>
   </div>
 </section>
 
-<section id="learning" class="section">
-  <h3 class="section-title">خطط مختصرة</h3>
-  <div id="learnPlan"></div>
-
-  <h3 class="section-title" style="margin-top: 24px;">مختارات علمية</h3>
-  <ul id="learnCollections" class="custom-list"></ul>
-
-  <h3 class="section-title" style="margin-top: 24px;">تذكيرات</h3>
-  <ul id="learnReminders" class="custom-list"></ul>
-  
-  <h3 class="section-title" style="margin-top: 24px;">روابط مفيدة</h3>
-  <div id="usefulLinks"></div>
+<section id="quranPage" class="page hidden">
+    <div class="quran-header">
+        <input type="text" id="quranSearch" placeholder="ابحث عن سورة...">
+        <div class="quran-tabs">
+            <button class="active" data-tab="surah">السور</button>
+            <button data-tab="juz">الأجزاء</button>
+        </div>
+    </div>
+    
+    <div id="surahList" class="quran-list"></div>
+    
+    <div id="readingView" class="hidden">
+        <div class="reading-controls">
+            <button id="backToList">← عودة</button>
+            <h2 id="currentSurahName"></h2>
+            <select id="readerSelect">
+                <option value="ar.alafasy">مشاري العفاسي</option>
+                <option value="ar.husary">الحصري</option>
+            </select>
+        </div>
+        <div id="quranText" class="quran-text-container"></div>
+    </div>
 </section>
     <section id="settings" class="section">
       <h3 class="section-title">إعدادات التطبيق</h3>
