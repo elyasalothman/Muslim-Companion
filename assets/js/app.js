@@ -72,7 +72,7 @@ async function fetchTimingsByCoords(date,lat,lon, methodOverride){const m = meth
 async function fetchTimingsByCity(date,city,country, methodOverride){const m = methodOverride || CFG.calculation.method; const ds=dateToApi(date); const u=`${API_BASE}/timingsByCity/${ds}?city=${encodeURIComponent(city)}&country=${encodeURIComponent(country)}&method=${m}&school=${CFG.calculation.school}&iso8601=true`; const r=await fetch(u); const j=await r.json(); if(j.code!==200) throw new Error(); return j.data;}
 
 function initScheme() {
-  const savedScheme = LS('scheme') || 'brown'; document.documentElement.setAttribute('data-scheme', savedScheme);
+  const savedScheme = LS('scheme') || 'colorful'; document.documentElement.setAttribute('data-scheme', savedScheme);
   document.querySelectorAll('.color-dot').forEach(btn => {
     btn.addEventListener('click', (e) => { const val = e.target.getAttribute('data-val'); document.documentElement.setAttribute('data-scheme', val); LS('scheme', val); });
   });
