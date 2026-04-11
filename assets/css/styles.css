@@ -75,7 +75,13 @@ header::before {
 .header-wrap{
   width:100%; padding:12px 14px; display:flex; align-items:center; justify-content:flex-start; /* لليمين في الـ RTL */
 }
-.brand{display:flex;align-items:center;font-weight:900;font-size:1.5rem;}
+.brand {
+  display: flex;
+  align-items: center;
+  font-weight: 900;
+  font-size: 1.5rem;
+  margin: 0; /* Ensures the header doesn't move */
+}
 .brand img{width:36px;height:36px}
 
 main{
